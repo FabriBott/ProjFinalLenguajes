@@ -1,0 +1,4 @@
+<h1><%= action_name == "new" ? "Nuevo producto" : "Editar producto" %></h1>
+
+<%= render 'form', producto: @producto %>
+<%= link_to 'Volver', productos_path %>

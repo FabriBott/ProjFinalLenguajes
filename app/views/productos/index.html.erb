@@ -1,0 +1,14 @@
+<h1>Lista de productos</h1>
+
+<%= link_to "Nuevo producto", new_producto_path %>
+
+<ul>
+  <% @productos.each do |producto| %>
+    <li>
+      <%= link_to producto.nombre, producto_path(producto) %> -
+      $<%= producto.precio %> |
+      <%= link_to "Editar", edit_producto_path(producto) %> |
+      <%= button_to "Eliminar", producto_path(producto), method: :delete, data: { confirm: "¿Seguro que quieres eliminar este producto?" } %>
+    </li>
+  <% end %>
+</ul>

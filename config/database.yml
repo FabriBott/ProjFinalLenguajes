@@ -1,0 +1,40 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  # For details on connection pooling, see Rails configuration guide
+  # https://guides.rubyonrails.org/configuring.html#database-pooling
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+
+development:
+  <<: *default
+  database: proy4_development
+  username: postgres        # o el usuario que usás para PostgreSQL
+  password: 7979Sugey2   # la contraseña que definiste en la instalación de PostgreSQL
+  host: localhost           # (opcional, suele estar bien así)
+
+test:
+  <<: *default
+  database: proy4_test
+  username: postgres        # o el usuario que usás para PostgreSQL
+  password: 7979Sugey2   # la contraseña que definiste en la instalación de PostgreSQL
+  host: localhost           # (opcional, suele estar bien así)
+
+production:
+  primary: &primary_production
+    <<: *default
+    database: proy4_production
+    username: proy4
+    password: <%= ENV["PROY4_DATABASE_PASSWORD"] %>
+  cache:
+    <<: *primary_production
+    database: proy4_production_cache
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *primary_production
+    database: proy4_production_queue
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *primary_production
+    database: proy4_production_cable
+    migrations_paths: db/cable_migrate
