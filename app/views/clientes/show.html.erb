@@ -1,0 +1,85 @@
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h3>Detalles del Cliente</h3>
+          <div>
+            <%= link_to 'Editar', edit_cliente_path(@cliente), class: 'btn btn-outline-primary btn-sm' %>
+            <%= link_to 'Eliminar', @cliente, method: :delete,
+                data: { confirm: '¿Está seguro?' },
+                class: 'btn btn-outline-danger btn-sm' %>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <strong>Nombre:</strong>
+              <p><%= @cliente.nombre %></p>
+            </div>
+            <div class="col-md-6">
+              <strong>Cédula:</strong>
+              <p><%= @cliente.cedula %></p>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <strong>Email:</strong>
+              <p><%= @cliente.email %></p>
+            </div>
+            <div class="col-md-6">
+              <strong>Teléfono:</strong>
+              <p><%= @cliente.telefono %></p>
+            </div>
+          </div>
+          
+          <% if @cliente.direccion.present? %>
+            <div class="row">
+              <div class="col-12">
+                <strong>Dirección:</strong>
+                <p><%= @cliente.direccion %></p>
+              </div>
+            </div>
+          <% end %>
+          
+          <hr>
+          
+          <h5>Facturas del Cliente</h5>
+          <% if @cliente.facturas.any? %>
+            <div class="table-responsive">
+              <table class="table table-sm">
+                <thead>
+                  <tr>
+                    <th>Número</th>
+                    <th>Fecha</th>
+                    <th>Total</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @cliente.facturas.por_fecha.each do |factura| %>
+                    <tr>
+                      <td><%= factura.numero %></td>
+                      <td><%= factura.fecha.strftime("%d/%m/%Y") %></td>
+                      <td>₡<%= number_with_delimiter(factura.total, delimiter: ',') %></td>
+                      <td>
+                        <%= link_to 'Ver', factura, class: 'btn btn-outline-primary btn-sm' %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% else %>
+            <p class="text-muted">No hay facturas para este cliente</p>
+          <% end %>
+        </div>
+        <div class="card-footer">
+          <%= link_to 'Volver', clientes_path, class: 'btn btn-secondary' %>
+          <%= link_to 'Nueva Factura', new_factura_path(cliente_id: @cliente.id), class: 'btn btn-primary' %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

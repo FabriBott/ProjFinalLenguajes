@@ -1,0 +1,96 @@
+<div class="container-fluid mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Sistema de Facturación</h1>
+    <div>
+      <%= link_to 'Clientes', clientes_path, class: 'btn btn-outline-secondary me-2' %>
+      <%= link_to 'Productos', productos_path, class: 'btn btn-outline-secondary me-2' %>
+      <%= link_to 'Nueva Factura', new_factura_path, class: 'btn btn-primary' %>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h4 class="mb-0">Facturas Emitidas</h4>
+    </div>
+    <div class="card-body">
+      <% if @facturas.any? %>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Número</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Subtotal</th>
+                <th>Impuesto</th>
+                <th>Total</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @facturas.each do |factura| %>
+                <tr>
+                  <td>
+                    <strong><%= factura.numero %></strong>
+                  </td>
+                  <td><%= factura.cliente.nombre %></td>
+                  <td><%= factura.fecha.strftime("%d/%m/%Y") %></td>
+                  <td>₡<%= number_with_delimiter(factura.subtotal, delimiter: ',') %></td>
+                  <td>₡<%= number_with_delimiter(factura.impuesto, delimiter: ',') %></td>
+                  <td>
+                    <strong>₡<%= number_with_delimiter(factura.total, delimiter: ',') %></strong>
+                  </td>
+                  <td>
+                    <%= link_to 'Ver', factura, class: 'btn btn-outline-primary btn-sm' %>
+                    <%= link_to 'PDF', factura_path(factura, format: :pdf), 
+                        class: 'btn btn-outline-danger btn-sm', 
+                        target: '_blank' %>
+                    <%= link_to 'Editar', edit_factura_path(factura), class: 'btn btn-outline-secondary btn-sm' %>
+                    <%= link_to 'Eliminar', factura, method: :delete,
+                        data: { confirm: '¿Está seguro?' },
+                        class: 'btn btn-outline-danger btn-sm' %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="mt-3">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h5>Total Facturas</h5>
+                  <h3><%= @facturas.count %></h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h5>Ventas del Mes</h5>
+                  <h3>₡<%= number_with_delimiter(@facturas.where(fecha: Date.current.beginning_of_month..Date.current.end_of_month).sum(:total), delimiter: ',') %></h3>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card bg-light">
+                <div class="card-body text-center">
+                  <h5>Ventas Totales</h5>
+                  <h3>₡<%= number_with_delimiter(@facturas.sum(:total), delimiter: ',') %></h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% else %>
+        <div class="text-center py-5">
+          <h4 class="text-muted">No hay facturas registradas</h4>
+          <p class="text-muted">Comience creando su primera factura</p>
+          <%= link_to 'Crear Primera Factura', new_factura_path, class: 'btn btn-primary btn-lg' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

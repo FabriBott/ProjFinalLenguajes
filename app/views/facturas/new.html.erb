@@ -1,0 +1,194 @@
+<div class="container-fluid mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h3>Nueva Factura</h3>
+    </div>
+    <div class="card-body">
+      <%= form_with(model: @factura, local: true, id: "factura-form") do |form| %>
+        <% if @factura.errors.any? %>
+          <div class="alert alert-danger">
+            <h4><%= pluralize(@factura.errors.count, "error") %> impidió crear esta factura:</h4>
+            <ul class="mb-0">
+              <% @factura.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <%= form.label :cliente_id, "Cliente", class: "form-label" %>
+              <%= form.select :cliente_id, 
+                  options_from_collection_for_select(@clientes, :id, :nombre_completo, params[:cliente_id]), 
+                  { prompt: 'Seleccione un cliente' }, 
+                  { class: "form-select", required: true } %>
+              <div class="mt-2">
+                <%= link_to 'Nuevo Cliente', new_cliente_path, class: 'btn btn-outline-secondary btn-sm', target: '_blank' %>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <%= form.label :fecha, class: "form-label" %>
+              <%= form.date_field :fecha, value: Date.current, class: "form-control", required: true %>
+            </div>
+          </div>
+        </div>
+
+        <hr>
+
+        <h5>Productos</h5>
+        <div id="detalles-container">
+          <div class="detalle-item border p-3 mb-3 rounded">
+            <div class="row align-items-end">
+              <div class="col-md-4">
+                <label class="form-label">Producto</label>
+                <select name="detalles[][producto_id]" class="form-select producto-select" onchange="updatePrice(this)">
+                  <option value="">Seleccione un producto</option>
+                  <% @productos.each do |producto| %>
+                    <option value="<%= producto.id %>" data-precio="<%= producto.precio %>">
+                      <%= producto.nombre %> - ₡<%= number_with_delimiter(producto.precio, delimiter: ',') %>
+                    </option>
+                  <% end %>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Cantidad</label>
+                <input type="number" name="detalles[][cantidad]" class="form-control cantidad-input" 
+                       min="1" value="1" onchange="calculateSubtotal(this)">
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Precio Unit.</label>
+                <input type="number" name="detalles[][precio_unitario]" class="form-control precio-input" 
+                       step="0.01" min="0" readonly>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Subtotal</label>
+                <input type="text" class="form-control subtotal-display" readonly>
+              </div>
+              <div class="col-md-2">
+                <button type="button" class="btn btn-outline-danger" onclick="removeDetalle(this)">
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <button type="button" class="btn btn-outline-primary" onclick="addDetalle()">
+            Agregar Producto
+          </button>
+        </div>
+
+        <hr>
+
+        <div class="row">
+          <div class="col-md-8"></div>
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between">
+                  <span>Subtotal:</span>
+                  <span id="total-subtotal">₡0.00</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span>Impuesto (13%):</span>
+                  <span id="total-impuesto">₡0.00</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between">
+                  <strong>Total:</strong>
+                  <strong id="total-final">₡0.00</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+          <%= link_to 'Cancelar', facturas_path, class: 'btn btn-secondary' %>
+          <%= form.submit 'Crear Factura', class: 'btn btn-primary btn-lg' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+  let detalleCount = 1;
+
+  function addDetalle() {
+    const container = document.getElementById('detalles-container');
+    const newDetalle = container.firstElementChild.cloneNode(true);
+    
+    // Limpiar valores
+    const selects = newDetalle.querySelectorAll('select');
+    const inputs = newDetalle.querySelectorAll('input');
+    
+    selects.forEach(select => select.selectedIndex = 0);
+    inputs.forEach(input => {
+      if (input.classList.contains('cantidad-input')) {
+        input.value = 1;
+      } else {
+        input.value = '';
+      }
+    });
+    
+    container.appendChild(newDetalle);
+    detalleCount++;
+  }
+
+  function removeDetalle(button) {
+    const container = document.getElementById('detalles-container');
+    if (container.children.length > 1) {
+      button.closest('.detalle-item').remove();
+      calculateTotal();
+    }
+  }
+
+  function updatePrice(select) {
+    const option = select.options[select.selectedIndex];
+    const precioInput = select.closest('.detalle-item').querySelector('.precio-input');
+    const precio = option.dataset.precio || 0;
+    
+    precioInput.value = precio;
+    calculateSubtotal(precioInput);
+  }
+
+  function calculateSubtotal(input) {
+    const detalleItem = input.closest('.detalle-item');
+    const cantidad = detalleItem.querySelector('.cantidad-input').value || 0;
+    const precio = detalleItem.querySelector('.precio-input').value || 0;
+    const subtotalDisplay = detalleItem.querySelector('.subtotal-display');
+    
+    const subtotal = cantidad * precio;
+    subtotalDisplay.value = '₡' + subtotal.toLocaleString('es-CR', {minimumFractionDigits: 2});
+    
+    calculateTotal();
+  }
+
+  function calculateTotal() {
+    let totalSubtotal = 0;
+    
+    document.querySelectorAll('.detalle-item').forEach(item => {
+      const cantidad = item.querySelector('.cantidad-input').value || 0;
+      const precio = item.querySelector('.precio-input').value || 0;
+      totalSubtotal += cantidad * precio;
+    });
+    
+    const impuesto = totalSubtotal * 0.13;
+    const total = totalSubtotal + impuesto;
+    
+    document.getElementById('total-subtotal').textContent = '₡' + totalSubtotal.toLocaleString('es-CR', {minimumFractionDigits: 2});
+    document.getElementById('total-impuesto').textContent = '₡' + impuesto.toLocaleString('es-CR', {minimumFractionDigits: 2});
+    document.getElementById('total-final').textContent = '₡' + total.toLocaleString('es-CR', {minimumFractionDigits: 2});
+  }
+
+  // Inicializar cálculos al cargar la página
+  document.addEventListener('DOMContentLoaded', function() {
+    calculateTotal();
+  });
+</script>

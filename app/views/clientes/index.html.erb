@@ -1,0 +1,48 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Clientes</h1>
+    <%= link_to 'Nuevo Cliente', new_cliente_path, class: 'btn btn-primary' %>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <% if @clientes.any? %>
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Cédula</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @clientes.each do |cliente| %>
+                <tr>
+                  <td><%= cliente.nombre %></td>
+                  <td><%= cliente.cedula %></td>
+                  <td><%= cliente.email %></td>
+                  <td><%= cliente.telefono %></td>
+                  <td>
+                    <%= link_to 'Ver', cliente, class: 'btn btn-outline-primary btn-sm' %>
+                    <%= link_to 'Editar', edit_cliente_path(cliente), class: 'btn btn-outline-secondary btn-sm' %>
+                    <%= link_to 'Eliminar', cliente, method: :delete,
+                        data: { confirm: '¿Está seguro?' },
+                        class: 'btn btn-outline-danger btn-sm' %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="text-center py-4">
+          <p class="text-muted">No hay clientes registrados</p>
+          <%= link_to 'Agregar primer cliente', new_cliente_path, class: 'btn btn-primary' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

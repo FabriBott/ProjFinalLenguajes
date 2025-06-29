@@ -1,0 +1,115 @@
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3>Factura <%= @factura.numero %></h3>
+      <div>
+        <%= link_to 'Descargar PDF', factura_path(@factura, format: :pdf), 
+            class: 'btn btn-danger', target: '_blank' %>
+        <%= link_to 'Editar', edit_factura_path(@factura), class: 'btn btn-outline-primary' %>
+        <%= link_to 'Eliminar', @factura, method: :delete,
+            data: { confirm: '¿Está seguro?' },
+            class: 'btn btn-outline-danger' %>
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- Información del cliente -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <h5>Información de la Empresa</h5>
+          <p>
+            <strong>Empresa XYZ</strong><br>
+            Dirección: Calle Principal #123<br>
+            Teléfono: (555) 123-4567<br>
+            Email: info@empresa.com
+          </p>
+        </div>
+        <div class="col-md-6">
+          <h5>Cliente</h5>
+          <p>
+            <strong><%= @factura.cliente.nombre %></strong><br>
+            Cédula: <%= @factura.cliente.cedula %><br>
+            <% if @factura.cliente.email.present? %>
+              Email: <%= @factura.cliente.email %><br>
+            <% end %>
+            <% if @factura.cliente.telefono.present? %>
+              Teléfono: <%= @factura.cliente.telefono %><br>
+            <% end %>
+            <% if @factura.cliente.direccion.present? %>
+              Dirección: <%= @factura.cliente.direccion %>
+            <% end %>
+          </p>
+        </div>
+      </div>
+
+      <!-- Información de la factura -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <table class="table table-borderless">
+            <tr>
+              <td><strong>Factura #:</strong></td>
+              <td><%= @factura.numero %></td>
+            </tr>
+            <tr>
+              <td><strong>Fecha:</strong></td>
+              <td><%= @factura.fecha.strftime("%d/%m/%Y") %></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Detalles de productos -->
+      <h5>Productos</h5>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Precio Unitario</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @factura.detalle_facturas.each do |detalle| %>
+              <tr>
+                <td><%= detalle.producto.nombre %></td>
+                <td><%= detalle.cantidad %></td>
+                <td>₡<%= number_with_delimiter(detalle.precio_unitario, delimiter: ',') %></td>
+                <td>₡<%= number_with_delimiter(detalle.subtotal, delimiter: ',') %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Totales -->
+      <div class="row">
+        <div class="col-md-8"></div>
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <span>Subtotal:</span>
+                <span>₡<%= number_with_delimiter(@factura.subtotal, delimiter: ',') %></span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span>Impuesto (13%):</span>
+                <span>₡<%= number_with_delimiter(@factura.impuesto, delimiter: ',') %></span>
+              </div>
+              <hr>
+              <div class="d-flex justify-content-between">
+                <strong>Total:</strong>
+                <strong>₡<%= number_with_delimiter(@factura.total, delimiter: ',') %></strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <%= link_to 'Volver a Facturas', facturas_path, class: 'btn btn-secondary' %>
+      <%= link_to 'Ver Cliente', @factura.cliente, class: 'btn btn-outline-info' %>
+      <%= link_to 'Nueva Factura', new_factura_path, class: 'btn btn-primary' %>
+    </div>
+  </div>
+</div>
