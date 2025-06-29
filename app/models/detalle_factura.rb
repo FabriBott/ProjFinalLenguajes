@@ -1,0 +1,21 @@
+class DetalleFactura < ApplicationRecord
+  belongs_to :factura
+  belongs_to :producto
+  
+  validates :cantidad, presence: true, numericality: { greater_than: 0 }
+  validates :precio_unitario, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :subtotal, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  
+  before_validation :set_precio_unitario, on: :create
+  before_save :calcular_subtotal
+  
+  private
+  
+  def set_precio_unitario
+    self.precio_unitario ||= producto&.precio
+  end
+  
+  def calcular_subtotal
+    self.subtotal = (cantidad || 0) * (precio_unitario || 0)
+  end
+end
