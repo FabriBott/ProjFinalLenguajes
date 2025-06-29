@@ -3,12 +3,38 @@
     <div class="col-md-8">
       <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <h3>Detalles del Cliente</h3>
+          <h3>Detalles del Cliente 
+            <span class="badge <%= @cliente.activo? ? 'bg-success' : 'bg-secondary' %> ms-2">
+              <%= @cliente.estado_texto %>
+            </span>
+          </h3>
           <div>
             <%= link_to 'Editar', edit_cliente_path(@cliente), class: 'btn btn-outline-primary btn-sm' %>
-            <%= link_to 'Eliminar', @cliente, method: :delete,
-                data: { confirm: '¿Está seguro?' },
-                class: 'btn btn-outline-danger btn-sm' %>
+            
+            <% if @cliente.activo? %>
+              <%= button_to 'Desactivar', toggle_estado_cliente_path(@cliente), 
+                  method: :patch,
+                  data: { confirm: '¿Está seguro de desactivar este cliente?' },
+                  class: 'btn btn-outline-warning btn-sm',
+                  form: { style: "display: inline;" } %>
+            <% else %>
+              <%= button_to 'Activar', toggle_estado_cliente_path(@cliente), 
+                  method: :patch,
+                  data: { confirm: '¿Está seguro de reactivar este cliente?' },
+                  class: 'btn btn-outline-success btn-sm',
+                  form: { style: "display: inline;" } %>
+            <% end %>
+            
+            <% if @cliente.puede_ser_eliminado? %>
+              <%= button_to 'Eliminar', @cliente, method: :delete,
+                  data: { confirm: '¿Está seguro? Esta acción no se puede deshacer.' },
+                  class: 'btn btn-outline-danger btn-sm',
+                  form: { style: "display: inline;" } %>
+            <% else %>
+              <button class="btn btn-outline-danger btn-sm" disabled title="No se puede eliminar: tiene facturas asociadas">
+                Eliminar
+              </button>
+            <% end %>
           </div>
         </div>
         <div class="card-body">

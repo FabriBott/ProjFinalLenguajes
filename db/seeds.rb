@@ -30,30 +30,30 @@ puts "Creando clientes..."
 clientes = [
   {
     nombre: "Juan Pérez Rodríguez",
-    cedula: "1-1234-5678",
+    cedula: "112345678",
     email: "juan.perez@email.com",
-    telefono: "8888-1234",
+    telefono: "88881234",
     direccion: "San José, Costa Rica"
   },
   {
     nombre: "María González López",
-    cedula: "2-2345-6789",
+    cedula: "223456789",
     email: "maria.gonzalez@email.com",
-    telefono: "8888-5678",
+    telefono: "88885678",
     direccion: "Cartago, Costa Rica"
   },
   {
     nombre: "Carlos Jiménez Mora",
-    cedula: "1-3456-7890",
+    cedula: "134567890",
     email: "carlos.jimenez@email.com",
-    telefono: "8888-9012",
+    telefono: "88889012",
     direccion: "Heredia, Costa Rica"
   },
   {
     nombre: "Ana Vargas Castro",
-    cedula: "2-4567-8901",
+    cedula: "245678901",
     email: "ana.vargas@email.com",
-    telefono: "8888-3456",
+    telefono: "88883456",
     direccion: "Alajuela, Costa Rica"
   }
 ]

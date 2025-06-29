@@ -20,7 +20,7 @@ class FacturasController < ApplicationController
 
   def new
     @factura = Factura.new
-    @clientes = Cliente.all.order(:nombre)
+    @clientes = Cliente.activos.order(:nombre)
     @productos = Producto.all.order(:nombre)
   end
 
@@ -44,7 +44,7 @@ class FacturasController < ApplicationController
       
       redirect_to @factura, notice: 'Factura creada exitosamente.'
     else
-      @clientes = Cliente.all.order(:nombre)
+      @clientes = Cliente.activos.order(:nombre)
       @productos = Producto.all.order(:nombre)
       render :new, status: :unprocessable_entity
     end

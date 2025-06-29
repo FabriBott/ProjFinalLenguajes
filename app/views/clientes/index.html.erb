@@ -4,9 +4,13 @@
     <%= link_to 'Nuevo Cliente', new_cliente_path, class: 'btn btn-primary' %>
   </div>
 
-  <div class="card">
+  <!-- Clientes Activos -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h4 class="mb-0">Clientes Activos</h4>
+    </div>
     <div class="card-body">
-      <% if @clientes.any? %>
+      <% if @clientes_activos.any? %>
         <div class="table-responsive">
           <table class="table table-striped">
             <thead>
@@ -15,22 +19,34 @@
                 <th>Cédula</th>
                 <th>Email</th>
                 <th>Teléfono</th>
+                <th>Estado</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
-              <% @clientes.each do |cliente| %>
+              <% @clientes_activos.each do |cliente| %>
                 <tr>
                   <td><%= cliente.nombre %></td>
                   <td><%= cliente.cedula %></td>
                   <td><%= cliente.email %></td>
                   <td><%= cliente.telefono %></td>
                   <td>
+                    <span class="badge bg-success">Activo</span>
+                  </td>
+                  <td>
                     <%= link_to 'Ver', cliente, class: 'btn btn-outline-primary btn-sm' %>
                     <%= link_to 'Editar', edit_cliente_path(cliente), class: 'btn btn-outline-secondary btn-sm' %>
-                    <%= link_to 'Eliminar', cliente, method: :delete,
-                        data: { confirm: '¿Está seguro?' },
-                        class: 'btn btn-outline-danger btn-sm' %>
+                    <%= button_to 'Desactivar', toggle_estado_cliente_path(cliente), 
+                        method: :patch,
+                        data: { confirm: '¿Está seguro de desactivar este cliente?' },
+                        class: 'btn btn-outline-warning btn-sm',
+                        form: { style: "display: inline;" } %>
+                    <% if cliente.puede_ser_eliminado? %>
+                      <%= button_to 'Eliminar', cliente, method: :delete,
+                          data: { confirm: '¿Está seguro? Esta acción no se puede deshacer.' },
+                          class: 'btn btn-outline-danger btn-sm',
+                          form: { style: "display: inline;" } %>
+                    <% end %>
                   </td>
                 </tr>
               <% end %>
@@ -39,10 +55,62 @@
         </div>
       <% else %>
         <div class="text-center py-4">
-          <p class="text-muted">No hay clientes registrados</p>
+          <p class="text-muted">No hay clientes activos registrados</p>
           <%= link_to 'Agregar primer cliente', new_cliente_path, class: 'btn btn-primary' %>
         </div>
       <% end %>
     </div>
   </div>
+
+  <!-- Clientes Inactivos -->
+  <% if @clientes_inactivos.any? %>
+    <div class="card">
+      <div class="card-header">
+        <h4 class="mb-0">Clientes Inactivos</h4>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Cédula</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @clientes_inactivos.each do |cliente| %>
+                <tr class="text-muted">
+                  <td><%= cliente.nombre %></td>
+                  <td><%= cliente.cedula %></td>
+                  <td><%= cliente.email %></td>
+                  <td><%= cliente.telefono %></td>
+                  <td>
+                    <span class="badge bg-secondary">Inactivo</span>
+                  </td>
+                  <td>
+                    <%= link_to 'Ver', cliente, class: 'btn btn-outline-primary btn-sm' %>
+                    <%= button_to 'Activar', toggle_estado_cliente_path(cliente), 
+                        method: :patch,
+                        data: { confirm: '¿Está seguro de reactivar este cliente?' },
+                        class: 'btn btn-outline-success btn-sm',
+                        form: { style: "display: inline;" } %>
+                    <% if cliente.puede_ser_eliminado? %>
+                      <%= button_to 'Eliminar', cliente, method: :delete,
+                          data: { confirm: '¿Está seguro? Esta acción no se puede deshacer.' },
+                          class: 'btn btn-outline-danger btn-sm',
+                          form: { style: "display: inline;" } %>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  <% end %>
 </div>
