@@ -25,7 +25,14 @@
 
             <div class="mb-3">
               <%= form.label :cedula, class: "form-label" %>
-              <%= form.text_field :cedula, class: "form-control", required: true %>
+              <%= form.text_field :cedula, class: "form-control", required: true, 
+                  pattern: "[0-9]{9,12}", 
+                  placeholder: "Ej: 112345678",
+                  title: "Formato: XXXXXXXXX",
+                  oninput: "validarCedula(this)" %>
+              <div class="invalid-feedback">
+                Solo se permiten números y formato DIMEX o cédula costarricense.
+              </div>
             </div>
 
             <div class="mb-3">
@@ -35,7 +42,14 @@
 
             <div class="mb-3">
               <%= form.label :telefono, class: "form-label" %>
-              <%= form.text_field :telefono, class: "form-control" %>
+              <%= form.text_field :telefono, class: "form-control", 
+                  pattern: "[0-9]{8}", 
+                  placeholder: "Ej: 87654321",
+                  title: "Formato: 8 dígitos",
+                  oninput: "validarTelefono(this)" %>
+              <div class="invalid-feedback">
+                Solo se permiten números (8 dígitos).
+              </div>
             </div>
 
             <div class="mb-3">
@@ -53,3 +67,80 @@
     </div>
   </div>
 </div>
+
+<script>
+function validarCedula(input) {
+  // Remover cualquier caracter que no sea número
+  let valor = input.value.replace(/[^0-9]/g, '');
+  
+  // Actualizar el valor del campo
+  input.value = valor;
+  
+  // Validar formato costarricense: 9 digitos o 12 para DIMEX
+  let esValido = /^\d{9,12}$/.test(valor);
+  
+  if (esValido) {
+    input.classList.remove('is-invalid');
+    input.classList.add('is-valid');
+  } else if (valor.length > 0) {
+    input.classList.remove('is-valid');
+    input.classList.add('is-invalid');
+  } else {
+    input.classList.remove('is-valid', 'is-invalid');
+  }
+}
+
+function validarTelefono(input) {
+  // Remover cualquier caracter que no sea número
+  let valor = input.value.replace(/[^0-9]/g, '');
+  
+  // Limitar a 8 dígitos
+  if (valor.length > 8) {
+    valor = valor.substring(0, 8);
+  }
+  
+  // Actualizar el valor del campo
+  input.value = valor;
+  
+  // Validar exactamente 8 dígitos
+  let esValido = /^\d{8}$/.test(valor);
+  
+  if (esValido) {
+    input.classList.remove('is-invalid');
+    input.classList.add('is-valid');
+  } else if (valor.length > 0) {
+    input.classList.remove('is-valid');
+    input.classList.add('is-invalid');
+  } else {
+    input.classList.remove('is-valid', 'is-invalid');
+  }
+}
+
+// Validación al enviar el formulario
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      const cedulaInput = document.querySelector('#cliente_cedula');
+      const telefonoInput = document.querySelector('#cliente_telefono');
+      
+      let errores = [];
+      
+      if (cedulaInput && !/^\d{9,12}$/.test(cedulaInput.value)) {
+        cedulaInput.classList.add('is-invalid');
+        errores.push('La cédula debe tener el formato DIMEX o cedula nacional (9 o 12 dígitos).');
+      }
+      
+      if (telefonoInput && telefonoInput.value && !/^\d{8}$/.test(telefonoInput.value)) {
+        telefonoInput.classList.add('is-invalid');
+        errores.push('El teléfono debe tener exactamente 8 dígitos.');
+      }
+      
+      if (errores.length > 0) {
+        e.preventDefault();
+        alert(errores.join('\n'));
+      }
+    });
+  }
+});
+</script>
