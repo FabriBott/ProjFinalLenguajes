@@ -12,19 +12,9 @@
       </div>
     </div>
     <div class="card-body">
-      <!-- Información del cliente -->
       <div class="row mb-4">
+      <!-- Información del cliente -->
         <div class="col-md-6">
-          <h5>Información de la Empresa</h5>
-          <p>
-            <strong>Empresa XYZ</strong><br>
-            Dirección: Calle Principal #123<br>
-            Teléfono: (555) 123-4567<br>
-            Email: info@empresa.com
-          </p>
-        </div>
-        <div class="col-md-6">
-          <h5>Cliente</h5>
           <p>
             <strong><%= @factura.cliente.nombre %></strong><br>
             Cédula: <%= @factura.cliente.cedula %><br>
@@ -39,24 +29,16 @@
             <% end %>
           </p>
         </div>
-      </div>
 
       <!-- Información de la factura -->
-      <div class="row mb-4">
         <div class="col-md-6">
-          <table class="table table-borderless">
-            <tr>
-              <td><strong>Factura #:</strong></td>
-              <td><%= @factura.numero %></td>
-            </tr>
-            <tr>
-              <td><strong>Fecha:</strong></td>
-              <td><%= @factura.fecha.strftime("%d/%m/%Y") %></td>
-            </tr>
-          </table>
+          <p>
+            <strong>Fecha:</strong> <%= @factura.fecha.strftime("%d/%m/%Y") %><br>
+            <strong>Total:</strong> ₡<%= number_with_delimiter(@factura.total, delimiter: ',') %>
+          </p>
         </div>
       </div>
-
+      
       <!-- Detalles de productos -->
       <h5>Productos</h5>
       <div class="table-responsive">
@@ -109,7 +91,6 @@
     <div class="card-footer">
       <%= link_to 'Volver a Facturas', facturas_path, class: 'btn btn-secondary' %>
       <%= link_to 'Ver Cliente', @factura.cliente, class: 'btn btn-outline-info' %>
-      <%= link_to 'Nueva Factura', new_factura_path, class: 'btn btn-primary' %>
     </div>
   </div>
 </div>
