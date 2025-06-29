@@ -1,11 +1,21 @@
 class FacturasController < ApplicationController
-  before_action :set_factura, only: [:show, :edit, :update, :destroy, :pdf]
+  before_action :set_factura, only: [:show, :edit, :update, :destroy]
 
   def index
     @facturas = Factura.includes(:cliente).por_fecha
   end
 
   def show
+    respond_to do |format|
+      format.html
+      format.pdf do
+        pdf = FacturaPdf.new(@factura)
+        send_data pdf.render, 
+                  filename: "factura_#{@factura.numero}.pdf",
+                  type: 'application/pdf',
+                  disposition: 'inline'
+      end
+    end
   end
 
   def new
@@ -58,18 +68,6 @@ class FacturasController < ApplicationController
   def destroy
     @factura.destroy
     redirect_to facturas_url, notice: 'Factura eliminada exitosamente.'
-  end
-
-  def pdf
-    respond_to do |format|
-      format.pdf do
-        pdf = FacturaPdf.new(@factura)
-        send_data pdf.render, 
-                  filename: "factura_#{@factura.numero}.pdf",
-                  type: 'application/pdf',
-                  disposition: 'attachment'
-      end
-    end
   end
 
   private

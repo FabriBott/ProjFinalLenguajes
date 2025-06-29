@@ -17,18 +17,11 @@ class FacturaPdf < Prawn::Document
 
   def header
     text "FACTURA", size: 30, style: :bold, align: :center
-    move_down 20
-    
-    text "Empresa XYZ", size: 16, style: :bold
-    text "Dirección: Calle Principal #123"
-    text "Teléfono: (555) 123-4567"
-    text "Email: info@empresa.com"
-    
     move_down 30
   end
 
   def client_info
-    bounding_box([bounds.width - 250, cursor], width: 250, height: 100) do
+    bounding_box([0, cursor], width: 250, height: 100) do
       text "CLIENTE:", style: :bold
       text @factura.cliente.nombre
       text "Cédula: #{@factura.cliente.cedula}"
@@ -41,7 +34,7 @@ class FacturaPdf < Prawn::Document
       end
     end
     
-    move_down 120
+    move_down 20
   end
 
   def invoice_details
@@ -60,17 +53,23 @@ class FacturaPdf < Prawn::Document
   end
 
   def line_items
-    table line_item_rows do
+    # Calcular anchos antes del bloque de la tabla
+    page_width = bounds.width
+    col_widths = {
+      0 => page_width * 0.45,  # Producto - 45%
+      1 => page_width * 0.15,  # Cantidad - 15%
+      2 => page_width * 0.20,  # Precio Unit. - 20%
+      3 => page_width * 0.20   # Subtotal - 20%
+    }
+    
+    table line_item_rows, width: page_width do
       row(0).font_style = :bold
       row(0).background_color = 'DDDDDD'
       self.header = true
       self.row_colors = ['FFFFFF', 'F9F9F9']
-      self.width = bounds.width
       
-      column(0).width = 200  # Producto
-      column(1).width = 80   # Cantidad
-      column(2).width = 100  # Precio Unit.
-      column(3).width = 100  # Subtotal
+      # Usar los anchos pre-calculados
+      self.column_widths = col_widths
       
       cells.padding = [5, 5, 5, 5]
       cells.borders = [:top, :bottom]
@@ -84,8 +83,8 @@ class FacturaPdf < Prawn::Document
       [
         detalle.producto.nombre,
         detalle.cantidad.to_s,
-        "₡#{number_with_delimiter(detalle.precio_unitario, delimiter: ',')}",
-        "₡#{number_with_delimiter(detalle.subtotal, delimiter: ',')}"
+        "¢#{number_with_delimiter(detalle.precio_unitario, delimiter: ',')}",
+        "¢#{number_with_delimiter(detalle.subtotal, delimiter: ',')}"
       ]
     end
   end
@@ -96,9 +95,9 @@ class FacturaPdf < Prawn::Document
     # Crear tabla de totales alineada a la derecha
     bounding_box([bounds.width - 200, cursor], width: 200, height: 80) do
       data = [
-        ['Subtotal:', "₡#{number_with_delimiter(@factura.subtotal, delimiter: ',')}"],
-        ['Impuesto (13%):', "₡#{number_with_delimiter(@factura.impuesto, delimiter: ',')}"],
-        ['TOTAL:', "₡#{number_with_delimiter(@factura.total, delimiter: ',')}"]
+        ['Subtotal:', "¢#{number_with_delimiter(@factura.subtotal, delimiter: ',')}"],
+        ['Impuesto (13%):', "¢#{number_with_delimiter(@factura.impuesto, delimiter: ',')}"],
+        ['TOTAL:', "¢#{number_with_delimiter(@factura.total, delimiter: ',')}"]
       ]
       
       table(data, width: 200, column_widths: [100, 100]) do
