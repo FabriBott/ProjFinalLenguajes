@@ -1,5 +1,5 @@
 class FacturasController < ApplicationController
-  before_action :set_factura, only: [:show, :edit, :update, :destroy]
+  before_action :set_factura, only: [:show]
 
   def index
     @facturas = Factura.includes(:cliente).por_fecha
@@ -48,26 +48,6 @@ class FacturasController < ApplicationController
       @productos = Producto.all.order(:nombre)
       render :new, status: :unprocessable_entity
     end
-  end
-
-  def edit
-    @clientes = Cliente.all.order(:nombre)
-    @productos = Producto.all.order(:nombre)
-  end
-
-  def update
-    if @factura.update(factura_params)
-      redirect_to @factura, notice: 'Factura actualizada exitosamente.'
-    else
-      @clientes = Cliente.all.order(:nombre)
-      @productos = Producto.all.order(:nombre)
-      render :edit, status: :unprocessable_entity
-    end
-  end
-
-  def destroy
-    @factura.destroy
-    redirect_to facturas_url, notice: 'Factura eliminada exitosamente.'
   end
 
   private

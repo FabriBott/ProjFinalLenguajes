@@ -5,10 +5,6 @@
       <div>
         <%= link_to 'Descargar PDF', factura_path(@factura, format: :pdf), 
             class: 'btn btn-danger', target: '_blank' %>
-        <%= link_to 'Editar', edit_factura_path(@factura), class: 'btn btn-outline-primary' %>
-        <%= link_to 'Eliminar', @factura, method: :delete,
-            data: { confirm: '¿Está seguro?' },
-            class: 'btn btn-outline-danger' %>
       </div>
     </div>
     <div class="card-body">

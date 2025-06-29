@@ -43,10 +43,6 @@
                     <%= link_to 'PDF', factura_path(factura, format: :pdf), 
                         class: 'btn btn-outline-danger btn-sm', 
                         target: '_blank' %>
-                    <%= link_to 'Editar', edit_factura_path(factura), class: 'btn btn-outline-secondary btn-sm' %>
-                    <%= link_to 'Eliminar', factura, method: :delete,
-                        data: { confirm: '¿Está seguro?' },
-                        class: 'btn btn-outline-danger btn-sm' %>
                   </td>
                 </tr>
               <% end %>

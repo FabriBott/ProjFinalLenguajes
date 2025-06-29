@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   resources :clientes
-  resources :facturas do
+  resources :facturas, only: [:index, :show, :new, :create] do
     member do
       get :pdf
     end
