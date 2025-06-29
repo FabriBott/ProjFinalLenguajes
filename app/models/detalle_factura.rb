@@ -7,12 +7,17 @@ class DetalleFactura < ApplicationRecord
   validates :subtotal, presence: true, numericality: { greater_than_or_equal_to: 0 }
   
   before_validation :set_precio_unitario, on: :create
+  before_validation :inicializar_subtotal, on: :create
   before_save :calcular_subtotal
   
   private
   
   def set_precio_unitario
     self.precio_unitario ||= producto&.precio
+  end
+  
+  def inicializar_subtotal
+    self.subtotal ||= 0
   end
   
   def calcular_subtotal

@@ -9,6 +9,7 @@ class Factura < ApplicationRecord
   
   before_validation :generar_numero, on: :create
   before_validation :set_fecha, on: :create
+  before_validation :inicializar_totales, on: :create
   before_save :calcular_totales
   
   scope :por_fecha, -> { order(fecha: :desc) }
@@ -35,5 +36,11 @@ class Factura < ApplicationRecord
   
   def set_fecha
     self.fecha ||= Date.current
+  end
+  
+  def inicializar_totales
+    self.subtotal ||= 0
+    self.impuesto ||= 0
+    self.total ||= 0
   end
 end

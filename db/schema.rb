@@ -10,9 +10,43 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_27_221019) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_29_030532) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "clientes", force: :cascade do |t|
+    t.string "nombre"
+    t.string "cedula"
+    t.string "email"
+    t.string "telefono"
+    t.text "direccion"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "detalle_facturas", force: :cascade do |t|
+    t.bigint "factura_id", null: false
+    t.bigint "producto_id", null: false
+    t.integer "cantidad"
+    t.decimal "precio_unitario"
+    t.decimal "subtotal"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["factura_id"], name: "index_detalle_facturas_on_factura_id"
+    t.index ["producto_id"], name: "index_detalle_facturas_on_producto_id"
+  end
+
+  create_table "facturas", force: :cascade do |t|
+    t.string "numero"
+    t.date "fecha"
+    t.bigint "cliente_id", null: false
+    t.decimal "subtotal"
+    t.decimal "impuesto"
+    t.decimal "total"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cliente_id"], name: "index_facturas_on_cliente_id"
+  end
 
   create_table "productos", force: :cascade do |t|
     t.string "nombre"
@@ -20,4 +54,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_27_221019) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
+
+  add_foreign_key "detalle_facturas", "facturas"
+  add_foreign_key "detalle_facturas", "productos"
+  add_foreign_key "facturas", "clientes"
 end
