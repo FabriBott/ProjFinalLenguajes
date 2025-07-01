@@ -2,7 +2,7 @@ class FacturasController < ApplicationController
   before_action :set_factura, only: [:show]
 
   def index
-    @facturas = Factura.includes(:cliente).por_fecha
+    @facturas = Factura.includes(:cliente).por_numero
   end
 
   def show

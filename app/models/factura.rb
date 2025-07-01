@@ -18,6 +18,7 @@ class Factura < ApplicationRecord
   after_create :setup_default_tax_association
   
   scope :por_fecha, -> { order(fecha: :desc) }
+  scope :por_numero, -> { order(numero: :desc) }
   
   # Getter virtual para IDs de tasas de impuesto
   def tasa_impuesto_ids
