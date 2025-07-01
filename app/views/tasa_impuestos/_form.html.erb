@@ -1,0 +1,55 @@
+<%= form_with(model: tasa_impuesto, local: true) do |form| %>
+  <% if tasa_impuesto.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(tasa_impuesto.errors.count, "error") %> impidieron guardar la tasa de impuesto:</h4>
+      <ul>
+        <% tasa_impuesto.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="mb-3">
+        <%= form.label :nombre, class: "form-label" %>
+        <%= form.text_field :nombre, class: "form-control" %>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="mb-3">
+        <%= form.label :porcentaje, "Porcentaje (%)", class: "form-label" %>
+        <%= form.number_field :porcentaje, step: 0.01, min: 0, max: 100, class: "form-control" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :descripcion, class: "form-label" %>
+    <%= form.text_area :descripcion, rows: 3, class: "form-control" %>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="form-check mb-3">
+        <%= form.check_box :activo, class: "form-check-input" %>
+        <%= form.label :activo, "Tasa activa", class: "form-check-label" %>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="form-check mb-3">
+        <%= form.check_box :predeterminado, class: "form-check-input" %>
+        <%= form.label :predeterminado, "Tasa predeterminada", class: "form-check-label" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <%= form.submit "Guardar", class: "btn btn-primary" %>
+    <%= link_to "Cancelar", tasa_impuestos_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>
+

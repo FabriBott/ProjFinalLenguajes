@@ -94,9 +94,16 @@ class FacturaPdf < Prawn::Document
     
     # Crear tabla de totales alineada a la derecha
     bounding_box([bounds.width - 200, cursor], width: 200, height: 80) do
+      # Determinar el texto del impuesto basado en la tasa
+      impuesto_text = if @factura.tasa_impuesto
+                        "#{@factura.tasa_impuesto.nombre} (#{@factura.tasa_impuesto.porcentaje}%):"
+                      else
+                        'Impuesto (13%):'
+                      end
+      
       data = [
         ['Subtotal:', "¢#{number_with_delimiter(@factura.subtotal, delimiter: ',')}"],
-        ['Impuesto (13%):', "¢#{number_with_delimiter(@factura.impuesto, delimiter: ',')}"],
+        [impuesto_text, "¢#{number_with_delimiter(@factura.impuesto, delimiter: ',')}"],
         ['TOTAL:', "¢#{number_with_delimiter(@factura.total, delimiter: ',')}"]
       ]
       

@@ -2,5 +2,12 @@
 
 <p>Precio: $<%= @producto.precio %></p>
 
+<p>
+  Stock: <%= @producto.stock || 0 %> unidades
+  <% if @producto.sin_stock? %>
+    <span style="color: red;">(Sin stock)</span>
+  <% end %>
+</p>
+
 <%= link_to "Editar", edit_producto_path(@producto) %> |
 <%= link_to "Volver", productos_path %>

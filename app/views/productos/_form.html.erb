@@ -21,6 +21,11 @@
     </div>
   
     <div>
+      <%= form.label :stock %><br>
+      <%= form.number_field :stock, step: 1, min: 0 %>
+    </div>
+  
+    <div>
       <%= form.submit %>
     </div>
   <% end %>

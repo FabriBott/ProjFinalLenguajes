@@ -1,5 +1,6 @@
 class Factura < ApplicationRecord
   belongs_to :cliente
+  belongs_to :tasa_impuesto, optional: true
   has_many :detalle_facturas, dependent: :destroy
   has_many :productos, through: :detalle_facturas
   
@@ -9,6 +10,7 @@ class Factura < ApplicationRecord
   
   before_validation :generar_numero, on: :create
   before_validation :set_fecha, on: :create
+  before_validation :set_tasa_impuesto_predeterminada, on: :create
   before_validation :inicializar_totales, on: :create
   before_save :calcular_totales
   
@@ -16,7 +18,11 @@ class Factura < ApplicationRecord
   
   def calcular_totales
     self.subtotal = detalle_facturas.sum(&:subtotal)
-    self.impuesto = subtotal * 0.13 # 13% de impuesto por defecto
+    if tasa_impuesto
+      self.impuesto = tasa_impuesto.calcular_impuesto(subtotal)
+    else
+      self.impuesto = subtotal * 0.13 # 13% de impuesto por defecto como fallback
+    end
     self.total = subtotal + impuesto
   end
   
@@ -36,6 +42,10 @@ class Factura < ApplicationRecord
   
   def set_fecha
     self.fecha ||= Date.current
+  end
+  
+  def set_tasa_impuesto_predeterminada
+    self.tasa_impuesto ||= TasaImpuesto.tasa_predeterminada
   end
   
   def inicializar_totales

@@ -29,10 +29,21 @@
               </div>
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-3">
             <div class="mb-3">
               <%= form.label :fecha, class: "form-label" %>
               <%= form.date_field :fecha, value: Date.current, class: "form-control", required: true %>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="mb-3">
+              <%= form.label :tasa_impuesto_id, "Tasa de Impuesto", class: "form-label" %>
+              <%= form.select :tasa_impuesto_id, 
+                  options_from_collection_for_select(@tasas_impuesto, :id, 
+                    ->(tasa) { "#{tasa.nombre} (#{tasa.porcentaje}%)" }, 
+                    @tasas_impuesto.find(&:predeterminado?)&.id), 
+                  { prompt: 'Seleccione tasa de impuesto' }, 
+                  { class: "form-select", required: true, onchange: "updateTaxCalculation()" } %>
             </div>
           </div>
         </div>
@@ -48,8 +59,8 @@
                 <select name="detalles[][producto_id]" class="form-select producto-select" onchange="updatePrice(this)">
                   <option value="">Seleccione un producto</option>
                   <% @productos.each do |producto| %>
-                    <option value="<%= producto.id %>" data-precio="<%= producto.precio %>">
-                      <%= producto.nombre %> - ₡<%= number_with_delimiter(producto.precio, delimiter: ',') %>
+                    <option value="<%= producto.id %>" data-precio="<%= producto.precio %>" data-stock="<%= producto.stock %>">
+                      <%= producto.nombre %> - ₡<%= number_with_delimiter(producto.precio, delimiter: ',') %> (Stock: <%= producto.stock %>)
                     </option>
                   <% end %>
                 </select>
@@ -95,7 +106,7 @@
                   <span id="total-subtotal">₡0.00</span>
                 </div>
                 <div class="d-flex justify-content-between">
-                  <span>Impuesto (13%):</span>
+                  <span id="impuesto-label">Impuesto:</span>
                   <span id="total-impuesto">₡0.00</span>
                 </div>
                 <hr>
@@ -179,12 +190,35 @@
       totalSubtotal += cantidad * precio;
     });
     
-    const impuesto = totalSubtotal * 0.13;
+    // Obtener la tasa de impuesto seleccionada
+    const tasaImpuestoSelect = document.querySelector('#factura_tasa_impuesto_id');
+    let tasaImpuesto = 0.13; // 13% por defecto
+    
+    if (tasaImpuestoSelect && tasaImpuestoSelect.selectedIndex > 0) {
+      const selectedOption = tasaImpuestoSelect.options[tasaImpuestoSelect.selectedIndex];
+      const tasaText = selectedOption.text;
+      const match = tasaText.match(/\((\d+(?:\.\d+)?)%\)/);
+      if (match) {
+        tasaImpuesto = parseFloat(match[1]) / 100;
+      }
+    }
+    
+    const impuesto = totalSubtotal * tasaImpuesto;
     const total = totalSubtotal + impuesto;
+    
+    // Actualizar el label del impuesto con el porcentaje
+    const impuestoLabel = document.getElementById('impuesto-label');
+    if (impuestoLabel) {
+      impuestoLabel.textContent = `Impuesto (${(tasaImpuesto * 100).toFixed(1)}%):`;
+    }
     
     document.getElementById('total-subtotal').textContent = '₡' + totalSubtotal.toLocaleString('es-CR', {minimumFractionDigits: 2});
     document.getElementById('total-impuesto').textContent = '₡' + impuesto.toLocaleString('es-CR', {minimumFractionDigits: 2});
     document.getElementById('total-final').textContent = '₡' + total.toLocaleString('es-CR', {minimumFractionDigits: 2});
+  }
+
+  function updateTaxCalculation() {
+    calculateTotal();
   }
 
   // Inicializar cálculos al cargar la página

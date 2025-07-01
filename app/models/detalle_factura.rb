@@ -5,6 +5,7 @@ class DetalleFactura < ApplicationRecord
   validates :cantidad, presence: true, numericality: { greater_than: 0 }
   validates :precio_unitario, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :subtotal, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validate :validar_stock_disponible
   
   before_validation :set_precio_unitario, on: :create
   before_validation :inicializar_subtotal, on: :create
@@ -22,5 +23,13 @@ class DetalleFactura < ApplicationRecord
   
   def calcular_subtotal
     self.subtotal = (cantidad || 0) * (precio_unitario || 0)
+  end
+  
+  def validar_stock_disponible
+    return unless producto && cantidad
+    
+    unless producto.tiene_stock?(cantidad)
+      errors.add(:cantidad, "No hay suficiente stock. Stock disponible: #{producto.stock}")
+    end
   end
 end

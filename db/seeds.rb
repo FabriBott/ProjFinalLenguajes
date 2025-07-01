@@ -6,19 +6,20 @@
 puts "Creando productos..."
 
 productos = [
-  { nombre: "Laptop Dell Inspiron", precio: 450000.00 },
-  { nombre: "Mouse Inalámbrico", precio: 15000.00 },
-  { nombre: "Teclado Mecánico", precio: 35000.00 },
-  { nombre: "Monitor 24 pulgadas", precio: 180000.00 },
-  { nombre: "Impresora HP", precio: 120000.00 },
-  { nombre: "Disco Duro Externo 1TB", precio: 65000.00 },
-  { nombre: "Memoria RAM 8GB", precio: 45000.00 },
-  { nombre: "Webcam HD", precio: 25000.00 }
+  { nombre: "Laptop Dell Inspiron", precio: 450000.00, stock: 10 },
+  { nombre: "Mouse Inalámbrico", precio: 15000.00, stock: 25 },
+  { nombre: "Teclado Mecánico", precio: 35000.00, stock: 15 },
+  { nombre: "Monitor 24 pulgadas", precio: 180000.00, stock: 8 },
+  { nombre: "Impresora HP", precio: 120000.00, stock: 5 },
+  { nombre: "Disco Duro Externo 1TB", precio: 65000.00, stock: 20 },
+  { nombre: "Memoria RAM 8GB", precio: 45000.00, stock: 30 },
+  { nombre: "Webcam HD", precio: 25000.00, stock: 12 }
 ]
 
 productos.each do |producto_data|
   Producto.find_or_create_by(nombre: producto_data[:nombre]) do |producto|
     producto.precio = producto_data[:precio]
+    producto.stock = producto_data[:stock]
   end
 end
 
@@ -112,6 +113,28 @@ if Cliente.any? && Producto.any?
   puts "#{Factura.count} facturas de ejemplo creadas."
 else
   puts "No se pudieron crear facturas - faltan clientes o productos."
+end
+
+# Tasas de Impuesto
+TasaImpuesto.find_or_create_by(nombre: 'IVA General') do |tasa|
+  tasa.porcentaje = 13.0
+  tasa.descripcion = 'Impuesto al Valor Agregado general'
+  tasa.activo = true
+  tasa.predeterminado = true
+end
+
+TasaImpuesto.find_or_create_by(nombre: 'IVA Reducido') do |tasa|
+  tasa.porcentaje = 4.0
+  tasa.descripcion = 'Impuesto al Valor Agregado reducido'
+  tasa.activo = true
+  tasa.predeterminado = false
+end
+
+TasaImpuesto.find_or_create_by(nombre: 'Exento') do |tasa|
+  tasa.porcentaje = 0.0
+  tasa.descripcion = 'Productos exentos de impuestos'
+  tasa.activo = true
+  tasa.predeterminado = false
 end
 
 puts "¡Datos de ejemplo creados exitosamente!"

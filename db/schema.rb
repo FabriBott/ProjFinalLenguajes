@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_29_200335) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_01_021354) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -46,7 +46,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_29_200335) do
     t.decimal "total"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "tasa_impuesto_id"
     t.index ["cliente_id"], name: "index_facturas_on_cliente_id"
+    t.index ["tasa_impuesto_id"], name: "index_facturas_on_tasa_impuesto_id"
   end
 
   create_table "productos", force: :cascade do |t|
@@ -54,9 +56,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_29_200335) do
     t.decimal "precio"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "stock", default: 0, null: false
+    t.index ["stock"], name: "index_productos_on_stock"
+  end
+
+  create_table "tasa_impuestos", force: :cascade do |t|
+    t.string "nombre", null: false
+    t.decimal "porcentaje", precision: 5, scale: 2, null: false
+    t.text "descripcion"
+    t.boolean "activo", default: true, null: false
+    t.boolean "predeterminado", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["activo"], name: "index_tasa_impuestos_on_activo"
+    t.index ["nombre"], name: "index_tasa_impuestos_on_nombre", unique: true
+    t.index ["predeterminado"], name: "index_tasa_impuestos_on_predeterminado"
   end
 
   add_foreign_key "detalle_facturas", "facturas"
   add_foreign_key "detalle_facturas", "productos"
   add_foreign_key "facturas", "clientes"
+  add_foreign_key "facturas", "tasa_impuestos"
 end

@@ -22,32 +22,54 @@ class FacturasController < ApplicationController
     @factura = Factura.new
     @clientes = Cliente.activos.order(:nombre)
     @productos = Producto.all.order(:nombre)
+    @tasas_impuesto = TasaImpuesto.activos.order(:nombre)
   end
 
   def create
     @factura = Factura.new(factura_params)
     
-    if @factura.save
-      # Crear detalles de factura
-      params[:detalles]&.each do |detalle|
-        next if detalle[:producto_id].blank? || detalle[:cantidad].blank?
+    ActiveRecord::Base.transaction do
+      if @factura.save
+        # Crear detalles de factura y validar stock
+        params[:detalles]&.each do |detalle|
+          next if detalle[:producto_id].blank? || detalle[:cantidad].blank?
+          
+          producto = Producto.find(detalle[:producto_id])
+          cantidad = detalle[:cantidad].to_i
+          
+          # Validar stock antes de crear el detalle
+          unless producto.tiene_stock?(cantidad)
+            raise ActiveRecord::Rollback, "No hay suficiente stock para #{producto.nombre}. Stock disponible: #{producto.stock}"
+          end
+          
+          # Crear el detalle
+          detalle_factura = @factura.detalle_facturas.create!(
+            producto_id: detalle[:producto_id],
+            cantidad: cantidad,
+            precio_unitario: detalle[:precio_unitario]
+          )
+          
+          # Reducir stock
+          producto.reducir_stock(cantidad)
+        end
         
-        @factura.detalle_facturas.create!(
-          producto_id: detalle[:producto_id],
-          cantidad: detalle[:cantidad],
-          precio_unitario: detalle[:precio_unitario]
-        )
+        @factura.calcular_totales
+        @factura.save!
+        
+        redirect_to @factura, notice: 'Factura creada exitosamente.'
+      else
+        load_form_data
+        render :new, status: :unprocessable_entity
       end
-      
-      @factura.calcular_totales
-      @factura.save!
-      
-      redirect_to @factura, notice: 'Factura creada exitosamente.'
-    else
-      @clientes = Cliente.activos.order(:nombre)
-      @productos = Producto.all.order(:nombre)
-      render :new, status: :unprocessable_entity
     end
+  rescue ActiveRecord::Rollback => e
+    @factura.errors.add(:base, e.message)
+    load_form_data
+    render :new, status: :unprocessable_entity
+  rescue => e
+    @factura.errors.add(:base, e.message)
+    load_form_data
+    render :new, status: :unprocessable_entity
   end
 
   private
@@ -57,6 +79,12 @@ class FacturasController < ApplicationController
   end
 
   def factura_params
-    params.require(:factura).permit(:cliente_id, :fecha)
+    params.require(:factura).permit(:cliente_id, :fecha, :tasa_impuesto_id)
+  end
+  
+  def load_form_data
+    @clientes = Cliente.activos.order(:nombre)
+    @productos = Producto.all.order(:nombre)
+    @tasas_impuesto = TasaImpuesto.activos.order(:nombre)
   end
 end

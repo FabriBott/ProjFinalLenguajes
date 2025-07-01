@@ -1,0 +1,69 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h1 class="card-title mb-0">Gestión de Tasas de Impuesto</h1>
+          <%= link_to 'Nueva Tasa', new_tasa_impuesto_path, class: 'btn btn-primary' %>
+        </div>
+        
+        <div class="card-body">
+          <% if @tasa_impuestos.any? %>
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Porcentaje</th>
+                    <th>Descripción</th>
+                    <th>Estado</th>
+                    <th>Predeterminado</th>
+                    <th class="text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @tasa_impuestos.each do |tasa| %>
+                    <tr>
+                      <td><%= tasa.nombre %></td>
+                      <td><%= "#{tasa.porcentaje}%" %></td>
+                      <td><%= tasa.descripcion %></td>
+                      <td>
+                        <% if tasa.activo? %>
+                          <span class="badge bg-success">Activo</span>
+                        <% else %>
+                          <span class="badge bg-secondary">Inactivo</span>
+                        <% end %>
+                      </td>
+                      <td>
+                        <% if tasa.predeterminado? %>
+                          <span class="badge bg-primary">Predeterminado</span>
+                        <% end %>
+                      </td>
+                      <td class="text-center">
+                        <div class="btn-group" role="group">
+                          <%= link_to 'Ver', tasa, class: 'btn btn-sm btn-outline-info' %>
+                          <%= link_to 'Editar', edit_tasa_impuesto_path(tasa), class: 'btn btn-sm btn-outline-warning' %>
+                          <% if tasa.puede_ser_eliminado? %>
+                            <%= link_to 'Eliminar', tasa, method: :delete, 
+                                        confirm: '¿Está seguro de eliminar esta tasa de impuesto?', 
+                                        class: 'btn btn-sm btn-outline-danger' %>
+                          <% end %>
+                        </div>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% else %>
+            <div class="alert alert-info text-center">
+              <h4>No hay tasas de impuesto registradas</h4>
+              <p>Comience creando una nueva tasa de impuesto.</p>
+              <%= link_to 'Crear Primera Tasa', new_tasa_impuesto_path, class: 'btn btn-primary' %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

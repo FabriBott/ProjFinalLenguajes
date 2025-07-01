@@ -6,7 +6,8 @@
   <% @productos.each do |producto| %>
     <li>
       <%= link_to producto.nombre, producto_path(producto) %> -
-      $<%= producto.precio %> |
+      $<%= producto.precio %> -
+      Stock: <%= producto.stock || 0 %> |
       <%= link_to "Editar", edit_producto_path(producto) %> |
       <%= button_to "Eliminar", producto_path(producto), method: :delete, data: { confirm: "¿Seguro que quieres eliminar este producto?" } %>
     </li>

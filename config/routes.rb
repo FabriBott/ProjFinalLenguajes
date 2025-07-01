@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :tasa_impuestos
   resources :clientes do
     member do
       patch :toggle_estado
