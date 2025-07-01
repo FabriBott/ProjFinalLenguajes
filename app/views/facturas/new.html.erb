@@ -70,7 +70,7 @@
               <div class="col-md-2">
                 <label class="form-label">Cantidad</label>
                 <input type="number" name="detalles[][cantidad]" class="form-control cantidad-input" 
-                       min="1" value="1" onchange="calculateSubtotal(this)">
+                       min="1" value="1" onchange="calculateSubtotal(this)" oninput="calculateSubtotal(this)">
               </div>
               <div class="col-md-2">
                 <label class="form-label">Precio Unit.</label>
@@ -148,13 +148,20 @@
     inputs.forEach(input => {
       if (input.classList.contains('cantidad-input')) {
         input.value = 1;
+        // Remover limitaciones de stock del elemento clonado
+        input.removeAttribute('max');
       } else {
         input.value = '';
       }
     });
     
+    // Remover alertas de stock del elemento clonado
+    const alerts = newDetalle.querySelectorAll('.stock-alert');
+    alerts.forEach(alert => alert.remove());
+    
     container.appendChild(newDetalle);
     detalleCount++;
+    calculateTotal();
   }
 
   function removeDetalle(button) {
@@ -169,8 +176,22 @@
     const option = select.options[select.selectedIndex];
     const precioInput = select.closest('.detalle-item').querySelector('.precio-input');
     const precio = option.dataset.precio || 0;
+    const stock = option.dataset.stock || 0;
     
     precioInput.value = precio;
+    
+    // Actualizar el atributo max del input de cantidad
+    const cantidadInput = select.closest('.detalle-item').querySelector('.cantidad-input');
+    cantidadInput.setAttribute('max', stock);
+    
+    // Si la cantidad actual es mayor al stock, resetearla
+    if (parseInt(cantidadInput.value) > parseInt(stock)) {
+      cantidadInput.value = Math.min(stock, 1);
+    }
+    
+    // Mostrar advertencia de stock
+    checkStock(select.closest('.detalle-item'));
+    
     calculateSubtotal(precioInput);
   }
 
@@ -183,7 +204,39 @@
     const subtotal = cantidad * precio;
     subtotalDisplay.value = '₡' + subtotal.toLocaleString('es-CR', {minimumFractionDigits: 2});
     
+    // Verificar stock al calcular subtotal
+    checkStock(detalleItem);
+    
     calculateTotal();
+  }
+
+  function checkStock(detalleItem) {
+    const productoSelect = detalleItem.querySelector('.producto-select');
+    const cantidadInput = detalleItem.querySelector('.cantidad-input');
+    const option = productoSelect.options[productoSelect.selectedIndex];
+    
+    // Remover alertas existentes
+    const existingAlert = detalleItem.querySelector('.stock-alert');
+    if (existingAlert) {
+      existingAlert.remove();
+    }
+    
+    if (productoSelect.selectedIndex > 0) { // Si hay un producto seleccionado
+      const stock = parseInt(option.dataset.stock) || 0;
+      const cantidad = parseInt(cantidadInput.value) || 0;
+      
+      if (cantidad > stock) {
+        // Crear alerta de stock insuficiente
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-warning mt-2 stock-alert';
+        alert.innerHTML = `<small><i class="fas fa-exclamation-triangle"></i> Stock insuficiente. Disponible: ${stock} unidades</small>`;
+        cantidadInput.parentNode.appendChild(alert);
+        
+        // Limitar la cantidad al stock disponible
+        cantidadInput.value = stock;
+        calculateSubtotal(cantidadInput);
+      }
+    }
   }
 
   function calculateTotal() {
@@ -258,5 +311,31 @@
     }
     
     calculateTotal();
+    
+    // Agregar validación al formulario antes del envío
+    document.getElementById('factura-form').addEventListener('submit', function(e) {
+      let hasStockErrors = false;
+      
+      document.querySelectorAll('.detalle-item').forEach(item => {
+        const productoSelect = item.querySelector('.producto-select');
+        const cantidadInput = item.querySelector('.cantidad-input');
+        
+        if (productoSelect.selectedIndex > 0) {
+          const option = productoSelect.options[productoSelect.selectedIndex];
+          const stock = parseInt(option.dataset.stock) || 0;
+          const cantidad = parseInt(cantidadInput.value) || 0;
+          
+          if (cantidad > stock) {
+            hasStockErrors = true;
+          }
+        }
+      });
+      
+      if (hasStockErrors) {
+        e.preventDefault();
+        alert('Por favor, corrija las cantidades que exceden el stock disponible antes de continuar.');
+        return false;
+      }
+    });
   });
 </script>

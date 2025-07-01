@@ -38,7 +38,7 @@ class FacturasController < ApplicationController
           cantidad = detalle[:cantidad].to_i
           
           # Validar stock antes de crear el detalle
-          unless producto.tiene_stock?(cantidad)
+          if producto.stock < cantidad
             raise ActiveRecord::Rollback, "No hay suficiente stock para #{producto.nombre}. Stock disponible: #{producto.stock}"
           end
           
@@ -49,8 +49,7 @@ class FacturasController < ApplicationController
             precio_unitario: detalle[:precio_unitario]
           )
           
-          # Reducir stock
-          producto.reducir_stock(cantidad)
+          # Registrar la salida de stock (esto ya reduce el stock automáticamente)
           producto.registrar_salida(cantidad, "Venta", "Factura ##{@factura.numero}", "Usuario")
         end
         
