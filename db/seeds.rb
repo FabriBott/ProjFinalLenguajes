@@ -1,3 +1,15 @@
+# Crear movimientos de stock
+if Producto.any?
+  puts "Creando movimientos de stock..."
+  productos = Producto.all
+
+  productos.each do |producto|
+    MovimientoStock.registrar_movimiento(producto, 'entrada', 5, 'Inventario inicial', 'Carga inicial', 'Sistema')
+  end
+
+  puts "Movimientos de stock iniciales creados."
+end
+
 # This file should ensure the existence of records required to run the application in every environment (production,
 # development, test). The code here should be idempotent so that it can be executed at any point in every environment.
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
@@ -239,8 +251,43 @@ else
   puts "No se pudieron crear facturas - faltan clientes o productos."
 end
 
+# Crear movimientos de stock adicionales para demostrar la funcionalidad
+puts "Creando movimientos de stock adicionales..."
+
+if Producto.any?
+  laptop = Producto.find_by(nombre: "Laptop Dell Inspiron")
+  mouse = Producto.find_by(nombre: "Mouse Inalámbrico")
+  monitor = Producto.find_by(nombre: "Monitor 24 pulgadas")
+  
+  if laptop
+    # Simular algunas ventas
+    MovimientoStock.registrar_movimiento(laptop, 'salida', 2, 'Venta', 'Venta a cliente empresarial', 'Vendedor Juan')
+    # Simular restock
+    MovimientoStock.registrar_movimiento(laptop, 'entrada', 5, 'Compra a proveedor', 'Restock mensual de laptops', 'Administrador')
+    # Simular ajuste por inventario
+    MovimientoStock.registrar_movimiento(laptop, 'ajuste', laptop.reload.stock - 1, 'Diferencia de conteo', 'Auditoría trimestral encontró diferencia', 'Auditor')
+  end
+  
+  if mouse
+    # Simular devolución
+    MovimientoStock.registrar_movimiento(mouse, 'entrada', 3, 'Devolución de cliente', 'Cliente devolvió productos defectuosos', 'Servicio al Cliente')
+    # Simular producto dañado
+    MovimientoStock.registrar_movimiento(mouse, 'salida', 2, 'Producto dañado/vencido', 'Productos dañados en transporte', 'Almacén')
+  end
+  
+  if monitor
+    # Simular transferencia
+    MovimientoStock.registrar_movimiento(monitor, 'salida', 1, 'Transferencia a sucursal', 'Envío a sucursal de Cartago', 'Logística')
+    # Simular muestra gratis
+    MovimientoStock.registrar_movimiento(monitor, 'salida', 1, 'Muestra gratis', 'Demo para cliente potencial grande', 'Ventas')
+  end
+  
+  puts "Movimientos de stock adicionales creados."
+end
+
 puts "¡Datos de ejemplo creados exitosamente!"
 puts "Productos: #{Producto.count}"
 puts "Clientes: #{Cliente.count}"
 puts "Tasas de Impuesto: #{TasaImpuesto.count}"
 puts "Facturas: #{Factura.count}"
+puts "Movimientos de Stock: #{MovimientoStock.count}"

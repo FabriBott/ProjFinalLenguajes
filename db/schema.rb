@@ -62,6 +62,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_01_050544) do
     t.index ["tasa_impuesto_id"], name: "index_facturas_on_tasa_impuesto_id"
   end
 
+  create_table "movimiento_stocks", force: :cascade do |t|
+    t.bigint "producto_id", null: false
+    t.string "tipo_movimiento", null: false
+    t.integer "cantidad", null: false
+    t.integer "cantidad_anterior", null: false
+    t.integer "cantidad_nueva", null: false
+    t.string "motivo", null: false
+    t.text "observaciones"
+    t.string "usuario", null: false
+    t.datetime "fecha_movimiento", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["fecha_movimiento"], name: "index_movimiento_stocks_on_fecha_movimiento"
+    t.index ["producto_id", "fecha_movimiento"], name: "index_movimiento_stocks_on_producto_id_and_fecha_movimiento"
+    t.index ["producto_id"], name: "index_movimiento_stocks_on_producto_id"
+    t.index ["tipo_movimiento"], name: "index_movimiento_stocks_on_tipo_movimiento"
+  end
+
   create_table "productos", force: :cascade do |t|
     t.string "nombre"
     t.decimal "precio"
@@ -90,4 +108,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_01_050544) do
   add_foreign_key "factura_tasa_impuestos", "tasa_impuestos"
   add_foreign_key "facturas", "clientes"
   add_foreign_key "facturas", "tasa_impuestos"
+  add_foreign_key "movimiento_stocks", "productos"
 end

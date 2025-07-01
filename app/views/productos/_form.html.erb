@@ -31,11 +31,49 @@
   
   <div class="mb-3">
     <%= form.label :stock, "Cantidad en Stock", class: "form-label" %>
-    <%= form.number_field :stock, step: 1, min: 0, class: "form-control", placeholder: "0", required: true %>
+    <%= form.number_field :stock, step: 1, min: 0, class: "form-control", placeholder: "0", required: true, id: "producto_stock", data: { original_stock: producto.persisted? ? producto.stock : 0 } %>
     <div class="invalid-feedback">
       Por favor ingrese una cantidad válida.
     </div>
+    <% if producto.persisted? %>
+      <div class="form-text">
+        Stock actual: <strong><%= producto.stock %></strong> unidades
+      </div>
+    <% end %>
   </div>
+  
+  <!-- Campo de motivo para cambios de stock (solo en edición) -->
+  <% if producto.persisted? %>
+    <div class="mb-3" id="stock-change-section" style="display: none;">
+      <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>Cambio de Stock Detectado</strong>
+        <p class="mb-2" id="change-description">Se registrará un movimiento de stock para este cambio.</p>
+        
+        <%= label_tag :motivo_stock, "Motivo del cambio", class: "form-label" %>
+        <%= select_tag :motivo_stock, 
+                      options_for_select([
+                        ['Selecciona un motivo', ''],
+                        ['Corrección de inventario', 'Corrección de inventario'],
+                        ['Diferencia de conteo', 'Diferencia de conteo'],
+                        ['Error de sistema', 'Error de sistema'],
+                        ['Compra a proveedor', 'Compra a proveedor'],
+                        ['Devolución de cliente', 'Devolución de cliente'],
+                        ['Producto dañado/vencido', 'Producto dañado/vencido'],
+                        ['Venta no registrada', 'Venta no registrada'],
+                        ['Auditoría', 'Auditoría'],
+                        ['Otros', 'Otros']
+                      ]), 
+                      { class: "form-select", required: false } %>
+        
+        <%= label_tag :observaciones_stock, "Observaciones (opcional)", class: "form-label mt-2" %>
+        <%= text_area_tag :observaciones_stock, "", 
+                         class: "form-control", 
+                         rows: 2, 
+                         placeholder: "Detalles adicionales sobre el cambio de stock..." %>
+      </div>
+    </div>
+  <% end %>
   
   <!-- Vista previa del producto -->
   <div class="card mb-4" id="product-preview" style="display: none;">
@@ -65,6 +103,10 @@
     const priceInput = document.querySelector('#producto_precio');
     const stockInput = document.querySelector('#producto_stock');
     const preview = document.querySelector('#product-preview');
+    const stockChangeSection = document.querySelector('#stock-change-section');
+    const motivoSelect = document.querySelector('#motivo_stock');
+    
+    let originalStock = stockInput ? parseInt(stockInput.dataset.originalStock) : 0;
     
     function updatePreview() {
       const name = nameInput.value || 'Nombre del Producto';
@@ -95,8 +137,76 @@
       form.classList.add('was-validated');
     });
     
-    // Inicializar preview
+    // Función para detectar cambios de stock
+    function checkStockChange() {
+      if (stockInput && stockChangeSection) {
+        const currentStock = parseInt(stockInput.value) || 0;
+        const changeDescription = document.querySelector('#change-description');
+        
+        if (currentStock !== originalStock) {
+          stockChangeSection.style.display = 'block';
+          
+          // Actualizar descripción del cambio
+          if (changeDescription) {
+            const difference = currentStock - originalStock;
+            let typeText = '';
+            let changeText = '';
+            
+            if (difference > 0) {
+              typeText = 'Entrada de stock';
+              changeText = `Se agregará ${difference} unidades al inventario`;
+            } else if (difference < 0) {
+              typeText = 'Salida de stock';
+              changeText = `Se removerá ${Math.abs(difference)} unidades del inventario`;
+            }
+            
+            changeDescription.innerHTML = `
+              <strong>${typeText}:</strong> ${changeText}<br>
+              <small class="text-muted">Stock actual: ${originalStock} → Nuevo stock: ${currentStock}</small>
+            `;
+          }
+          
+          // Hacer el motivo requerido cuando hay cambio de stock
+          if (motivoSelect) {
+            motivoSelect.required = true;
+          }
+        } else {
+          stockChangeSection.style.display = 'none';
+          // Quitar requerimiento cuando no hay cambio
+          if (motivoSelect) {
+            motivoSelect.required = false;
+          }
+        }
+      }
+    }
+    
+    // Agregar listener para detectar cambios de stock
+    if (stockInput) {
+      stockInput.addEventListener('input', checkStockChange);
+      stockInput.addEventListener('change', checkStockChange);
+    }
+    
+    // Validación adicional para el motivo cuando hay cambio de stock
+    form.addEventListener('submit', function(event) {
+      const currentStock = parseInt(stockInput.value) || 0;
+      if (currentStock !== originalStock && motivoSelect && !motivoSelect.value) {
+        event.preventDefault();
+        event.stopPropagation();
+        alert('Por favor selecciona un motivo para el cambio de stock.');
+        motivoSelect.focus();
+        return false;
+      }
+      
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    });
+    
+    // Inicializar preview y verificación de stock
     updatePreview();
+    checkStockChange();
   });
 </script>
   

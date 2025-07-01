@@ -17,6 +17,17 @@
             <p class="mb-0"><strong>Stock:</strong> <%= @producto.stock %> unidades</p>
           </div>
           
+          <!-- Advertencia sobre movimientos automáticos -->
+          <div class="alert alert-warning mb-4">
+            <h6 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Importante:</h6>
+            <p class="mb-2">Cualquier cambio en el stock será registrado automáticamente como un movimiento de inventario.</p>
+            <ul class="mb-0 small">
+              <li>Si <strong>aumentas</strong> el stock: se registrará como "Entrada - Ajuste manual"</li>
+              <li>Si <strong>reduces</strong> el stock: se registrará como "Salida - Ajuste manual"</li>
+              <li>El movimiento incluirá detalles del cambio realizado</li>
+            </ul>
+          </div>
+          
           <%= render 'form', producto: @producto %>
         </div>
       </div>

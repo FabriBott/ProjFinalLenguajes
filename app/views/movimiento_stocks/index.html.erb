@@ -1,0 +1,135 @@
+<% content_for :title, "Movimientos de Stock" %>
+
+<div class="container my-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-boxes"></i> Movimientos de Stock</h1>
+    <%= link_to new_movimiento_stock_path, class: "btn btn-success" do %>
+      <i class="fas fa-plus"></i> Nuevo Movimiento
+    <% end %>
+  </div>
+
+  <!-- Filtros -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0"><i class="fas fa-filter"></i> Filtros</h5>
+    </div>
+    <div class="card-body">
+      <%= form_with url: movimiento_stocks_path, method: :get, local: true, class: "row g-3" do |f| %>
+        <div class="col-md-3">
+          <%= f.label :producto_id, "Producto", class: "form-label" %>
+          <%= f.collection_select :producto_id, @productos, :id, :nombre, 
+                                 { prompt: "Todos los productos", selected: params[:producto_id] }, 
+                                 { class: "form-select" } %>
+        </div>
+        <div class="col-md-2">
+          <%= f.label :tipo_movimiento, "Tipo", class: "form-label" %>
+          <%= f.select :tipo_movimiento, 
+                      options_for_select([
+                        ['Todos', ''],
+                        ['Entrada', 'entrada'],
+                        ['Salida', 'salida'],
+                        ['Ajuste', 'ajuste']
+                      ], params[:tipo_movimiento]), 
+                      {}, { class: "form-select" } %>
+        </div>
+        <div class="col-md-2">
+          <%= f.label :fecha_inicio, "Desde", class: "form-label" %>
+          <%= f.date_field :fecha_inicio, value: params[:fecha_inicio], class: "form-control" %>
+        </div>
+        <div class="col-md-2">
+          <%= f.label :fecha_fin, "Hasta", class: "form-label" %>
+          <%= f.date_field :fecha_fin, value: params[:fecha_fin], class: "form-control" %>
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+          <%= f.submit "Filtrar", class: "btn btn-primary me-2" %>
+          <%= link_to "Limpiar", movimiento_stocks_path, class: "btn btn-outline-secondary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Tabla de Movimientos -->
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">Historial de Movimientos</h5>
+    </div>
+    <div class="card-body">
+      <% if @movimientos.any? %>
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th><i class="fas fa-calendar"></i> Fecha</th>
+                <th><i class="fas fa-box"></i> Producto</th>
+                <th><i class="fas fa-arrow-up-down"></i> Tipo</th>
+                <th><i class="fas fa-sort-numeric-up"></i> Cantidad</th>
+                <th><i class="fas fa-chart-line"></i> Stock</th>
+                <th><i class="fas fa-comment"></i> Motivo</th>
+                <th><i class="fas fa-user"></i> Usuario</th>
+                <th><i class="fas fa-cogs"></i> Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @movimientos.each do |movimiento| %>
+                <tr>
+                  <td>
+                    <small class="text-muted">
+                      <%= movimiento.fecha_movimiento.strftime("%d/%m/%Y") %><br>
+                      <%= movimiento.fecha_movimiento.strftime("%H:%M") %>
+                    </small>
+                  </td>
+                  <td>
+                    <strong><%= movimiento.producto.nombre %></strong><br>
+                    <small class="text-muted">ID: <%= movimiento.producto.id %></small>
+                  </td>
+                  <td>
+                    <span class="<%= movimiento.badge_class %>">
+                      <i class="fas fa-<%= movimiento.entrada? ? 'arrow-up' : movimiento.salida? ? 'arrow-down' : 'sync' %>"></i>
+                      <%= movimiento.tipo_movimiento.capitalize %>
+                    </span>
+                  </td>
+                  <td>
+                    <span class="fs-6 fw-bold <%= movimiento.entrada? ? 'text-success' : 'text-danger' %>">
+                      <%= movimiento.diferencia_con_signo %>
+                    </span>
+                  </td>
+                  <td>
+                    <span class="text-muted"><%= movimiento.cantidad_anterior %></span>
+                    <i class="fas fa-arrow-right mx-1"></i>
+                    <span class="fw-bold"><%= movimiento.cantidad_nueva %></span>
+                  </td>
+                  <td>
+                    <span class="badge bg-light text-dark"><%= movimiento.motivo %></span>
+                    <% if movimiento.observaciones.present? %>
+                      <br><small class="text-muted"><%= truncate(movimiento.observaciones, length: 50) %></small>
+                    <% end %>
+                  </td>
+                  <td><%= movimiento.usuario %></td>
+                  <td>
+                    <%= link_to movimiento_stock_path(movimiento), class: "btn btn-outline-info btn-sm" do %>
+                      <i class="fas fa-eye"></i> Ver
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Paginación -->
+        <% if defined?(Kaminari) && @movimientos.respond_to?(:current_page) %>
+          <%= paginate @movimientos %>
+        <% end %>
+      <% else %>
+        <div class="text-center py-5">
+          <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+          <h5 class="text-muted">No hay movimientos de stock registrados</h5>
+          <p class="text-muted">Comienza registrando tu primer movimiento de inventario.</p>
+          <%= link_to new_movimiento_stock_path, class: "btn btn-success" do %>
+            <i class="fas fa-plus"></i> Crear Primer Movimiento
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

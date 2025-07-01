@@ -1,0 +1,122 @@
+<% content_for :title, "Detalle del Movimiento" %>
+
+<div class="container my-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0">
+            <i class="fas fa-file-alt"></i> 
+            Detalle del Movimiento de Stock
+          </h4>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <!-- Información del Producto -->
+            <div class="col-md-6">
+              <h5><i class="fas fa-box"></i> Producto</h5>
+              <table class="table table-sm">
+                <tr>
+                  <th>Nombre:</th>
+                  <td><%= @movimiento_stock.producto.nombre %></td>
+                </tr>
+                <tr>
+                  <th>ID:</th>
+                  <td><%= @movimiento_stock.producto.id %></td>
+                </tr>
+                <tr>
+                  <th>Stock Actual:</th>
+                  <td><strong><%= @movimiento_stock.producto.stock %> unidades</strong></td>
+                </tr>
+              </table>
+            </div>
+            
+            <!-- Información del Movimiento -->
+            <div class="col-md-6">
+              <h5><i class="fas fa-exchange-alt"></i> Movimiento</h5>
+              <table class="table table-sm">
+                <tr>
+                  <th>Tipo:</th>
+                  <td>
+                    <span class="<%= @movimiento_stock.badge_class %>">
+                      <i class="fas fa-<%= @movimiento_stock.entrada? ? 'arrow-up' : @movimiento_stock.salida? ? 'arrow-down' : 'sync' %>"></i>
+                      <%= @movimiento_stock.tipo_movimiento.capitalize %>
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Cantidad:</th>
+                  <td>
+                    <span class="fs-5 fw-bold <%= @movimiento_stock.entrada? ? 'text-success' : 'text-danger' %>">
+                      <%= @movimiento_stock.diferencia_con_signo %> unidades
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Fecha:</th>
+                  <td><%= @movimiento_stock.fecha_movimiento.strftime("%d/%m/%Y %H:%M") %></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          
+          <hr>
+          
+          <!-- Detalles del Movimiento -->
+          <div class="row">
+            <div class="col-12">
+              <h5><i class="fas fa-info-circle"></i> Detalles</h5>
+              <table class="table">
+                <tr>
+                  <th style="width: 200px;">Stock Anterior:</th>
+                  <td><%= @movimiento_stock.cantidad_anterior %> unidades</td>
+                </tr>
+                <tr>
+                  <th>Stock Nuevo:</th>
+                  <td><%= @movimiento_stock.cantidad_nueva %> unidades</td>
+                </tr>
+                <tr>
+                  <th>Diferencia:</th>
+                  <td>
+                    <span class="<%= @movimiento_stock.diferencia >= 0 ? 'text-success' : 'text-danger' %>">
+                      <%= @movimiento_stock.diferencia_con_signo %> unidades
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Motivo:</th>
+                  <td><span class="badge bg-light text-dark"><%= @movimiento_stock.motivo %></span></td>
+                </tr>
+                <% if @movimiento_stock.observaciones.present? %>
+                  <tr>
+                    <th>Observaciones:</th>
+                    <td><%= @movimiento_stock.observaciones %></td>
+                  </tr>
+                <% end %>
+                <tr>
+                  <th>Usuario:</th>
+                  <td><%= @movimiento_stock.usuario %></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          
+          <!-- Acciones -->
+          <div class="d-flex gap-2 mt-4">
+            <%= link_to movimiento_stocks_path, class: "btn btn-secondary" do %>
+              <i class="fas fa-arrow-left"></i> Volver al Listado
+            <% end %>
+            
+            <%= link_to movimiento_stocks_path(producto_id: @movimiento_stock.producto.id), class: "btn btn-info" do %>
+              <i class="fas fa-history"></i> Ver Historial del Producto
+            <% end %>
+            
+            <%= link_to new_movimiento_stock_path(producto_id: @movimiento_stock.producto.id), class: "btn btn-success" do %>
+              <i class="fas fa-plus"></i> Nuevo Movimiento para este Producto
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
