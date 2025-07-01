@@ -51,6 +51,7 @@ class FacturasController < ApplicationController
           
           # Reducir stock
           producto.reducir_stock(cantidad)
+          producto.registrar_salida(cantidad, "Venta", "Factura ##{@factura.numero}", "Usuario")
         end
         
         @factura.calcular_totales

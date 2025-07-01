@@ -1,0 +1,171 @@
+<% content_for :title, "Nuevo Movimiento de Stock" %>
+
+<div class="container my-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0"><i class="fas fa-plus-circle"></i> Nuevo Movimiento de Stock</h4>
+        </div>
+        <div class="card-body">
+          <%= form_with model: @movimiento_stock, url: movimiento_stocks_path, local: true, class: "row g-3" do |f| %>
+            
+            <!-- Selección de Producto -->
+            <div class="col-12">
+              <%= f.label :producto_id, "Producto", class: "form-label" %>
+              <% if @producto %>
+                <div class="input-group">
+                  <input type="text" class="form-control" value="<%= @producto.nombre %>" readonly>
+                  <span class="input-group-text">Stock actual: <strong><%= @producto.stock %></strong></span>
+                  <%= hidden_field_tag :producto_id, @producto.id %>
+                </div>
+              <% else %>
+                <%= collection_select :producto_id, nil, Producto.all.order(:nombre), :id, :nombre, 
+                                     { prompt: "Selecciona un producto" }, 
+                                     { class: "form-select", id: "producto_select" } %>
+                <div id="stock_info" class="form-text"></div>
+              <% end %>
+            </div>
+            
+            <!-- Tipo de Movimiento -->
+            <div class="col-md-6">
+              <%= f.label :tipo_movimiento, "Tipo de Movimiento", class: "form-label" %>
+              <%= f.select :tipo_movimiento, @tipos_movimiento, 
+                          { prompt: "Selecciona el tipo" }, 
+                          { class: "form-select", id: "tipo_movimiento" } %>
+            </div>
+            
+            <!-- Cantidad -->
+            <div class="col-md-6">
+              <%= f.label :cantidad, "Cantidad", class: "form-label" %>
+              <%= f.number_field :cantidad, class: "form-control", min: 1, step: 1, id: "cantidad" %>
+              <div class="form-text" id="cantidad_help"></div>
+            </div>
+            
+            <!-- Motivo -->
+            <div class="col-12">
+              <%= f.label :motivo, "Motivo", class: "form-label" %>
+              <%= f.select :motivo, [], { prompt: "Selecciona primero el tipo de movimiento" }, 
+                          { class: "form-select", id: "motivo_select" } %>
+            </div>
+            
+            <!-- Usuario -->
+            <div class="col-md-6">
+              <%= f.label :usuario, "Usuario", class: "form-label" %>
+              <%= f.text_field :usuario, class: "form-control", value: "Administrador" %>
+            </div>
+            
+            <!-- Observaciones -->
+            <div class="col-12">
+              <%= f.label :observaciones, "Observaciones (Opcional)", class: "form-label" %>
+              <%= f.text_area :observaciones, class: "form-control", rows: 3, 
+                             placeholder: "Ingresa detalles adicionales sobre este movimiento..." %>
+            </div>
+            
+            <!-- Botones -->
+            <div class="col-12">
+              <div class="d-flex gap-2">
+                <%= f.submit "Registrar Movimiento", class: "btn btn-success" %>
+                <%= link_to "Cancelar", movimiento_stocks_path, class: "btn btn-secondary" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tipoSelect = document.getElementById('tipo_movimiento');
+    const motivoSelect = document.getElementById('motivo_select');
+    const productoSelect = document.getElementById('producto_select');
+    const stockInfo = document.getElementById('stock_info');
+    const cantidadInput = document.getElementById('cantidad');
+    const cantidadHelp = document.getElementById('cantidad_help');
+    
+    // Manejar cambio de tipo de movimiento
+    if (tipoSelect) {
+      tipoSelect.addEventListener('change', function() {
+        const tipo = this.value;
+        
+        if (tipo) {
+          fetch(`/movimiento_stocks/motivos?tipo=${tipo}`)
+            .then(response => response.json())
+            .then(motivos => {
+              motivoSelect.innerHTML = '<option value="">Selecciona un motivo</option>';
+              motivos.forEach(motivo => {
+                const option = document.createElement('option');
+                option.value = motivo;
+                option.textContent = motivo;
+                motivoSelect.appendChild(option);
+              });
+            });
+        } else {
+          motivoSelect.innerHTML = '<option value="">Selecciona primero el tipo de movimiento</option>';
+        }
+        
+        updateCantidadHelp();
+      });
+    }
+    
+    // Manejar cambio de producto (si no está predefinido)
+    if (productoSelect) {
+      productoSelect.addEventListener('change', function() {
+        const productoId = this.value;
+        
+        if (productoId) {
+          // Buscar el stock del producto seleccionado
+          const selectedOption = this.options[this.selectedIndex];
+          const productoNombre = selectedOption.text;
+          
+          // Aquí podrías hacer una llamada AJAX para obtener el stock actual
+          // Por ahora, mostraremos una indicación genérica
+          stockInfo.innerHTML = '<i class="fas fa-info-circle"></i> Producto seleccionado: ' + productoNombre;
+        } else {
+          stockInfo.innerHTML = '';
+        }
+        
+        updateCantidadHelp();
+      });
+    }
+    
+    // Actualizar ayuda de cantidad
+    function updateCantidadHelp() {
+      const tipo = tipoSelect ? tipoSelect.value : '';
+      
+      if (tipo === 'entrada') {
+        cantidadHelp.innerHTML = '<i class="fas fa-arrow-up text-success"></i> Se sumará esta cantidad al stock actual';
+      } else if (tipo === 'salida') {
+        cantidadHelp.innerHTML = '<i class="fas fa-arrow-down text-danger"></i> Se restará esta cantidad del stock actual';
+      } else if (tipo === 'ajuste') {
+        cantidadHelp.innerHTML = '<i class="fas fa-sync text-warning"></i> Esta será la nueva cantidad total en stock';
+      } else {
+        cantidadHelp.innerHTML = '';
+      }
+    }
+    
+    // Validación del formulario
+    const form = document.querySelector('form');
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        const tipo = tipoSelect.value;
+        const cantidad = parseInt(cantidadInput.value);
+        
+        if (!tipo || !cantidad || cantidad <= 0) {
+          e.preventDefault();
+          alert('Por favor, completa todos los campos requeridos.');
+          return;
+        }
+        
+        // Confirmación adicional para movimientos de salida grandes
+        if (tipo === 'salida' && cantidad > 10) {
+          if (!confirm(`¿Estás seguro de que deseas registrar una salida de ${cantidad} unidades?`)) {
+            e.preventDefault();
+          }
+        }
+      });
+    }
+  });
+</script>

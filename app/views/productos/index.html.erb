@@ -126,6 +126,9 @@
                 <%= link_to edit_producto_path(producto), class: "btn btn-sm btn-outline-warning", title: "Editar producto" do %>
                   <i class="fas fa-edit"></i>
                 <% end %>
+                <%= link_to movimiento_stocks_path(producto_id: producto.id), class: "btn btn-sm btn-outline-primary", title: "Ver historial de stock" do %>
+                  <i class="fas fa-history"></i>
+                <% end %>
                 <%= button_to producto, method: :delete, 
                              data: { confirm: "¿Estás seguro de eliminar '#{producto.nombre}'?" }, 
                              class: "btn btn-sm btn-outline-danger", 
