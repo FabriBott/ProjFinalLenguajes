@@ -79,7 +79,7 @@ class FacturasController < ApplicationController
   end
 
   def factura_params
-    params.require(:factura).permit(:cliente_id, :fecha, :tasa_impuesto_id)
+    params.require(:factura).permit(:cliente_id, :fecha, :tasa_impuesto_id, tasa_impuesto_ids: [])
   end
   
   def load_form_data

@@ -92,34 +92,38 @@ class FacturaPdf < Prawn::Document
   def totals
     move_down 20
     
-    # Crear tabla de totales alineada a la derecha
-    bounding_box([bounds.width - 200, cursor], width: 200, height: 80) do
-      # Determinar el texto del impuesto basado en la tasa
-      impuesto_text = if @factura.tasa_impuesto
-                        "#{@factura.tasa_impuesto.nombre} (#{@factura.tasa_impuesto.porcentaje}%):"
-                      else
-                        'Impuesto (13%):'
-                      end
+    # Construir datos de totales
+    data = [
+      ['Subtotal:', "¢#{number_with_delimiter(@factura.subtotal, delimiter: ',')}"]
+    ]
+    
+    # Agregar cada impuesto por separado
+    @factura.detalle_impuestos.each do |impuesto_detalle|
+      data << ["#{impuesto_detalle[:nombre]} (#{impuesto_detalle[:porcentaje]}%):", 
+               "¢#{number_with_delimiter(impuesto_detalle[:monto], delimiter: ',')}"]
+    end
+    
+    # Si hay múltiples impuestos, agregar línea de total de impuestos
+    if @factura.detalle_impuestos.size > 1
+      data << ['Total Impuestos:', "¢#{number_with_delimiter(@factura.impuesto, delimiter: ',')}"]
+    end
+    
+    # Agregar total final
+    data << ['TOTAL:', "¢#{number_with_delimiter(@factura.total, delimiter: ',')}"]
+    
+    # Crear tabla de totales sin bounding_box, directamente alineada a la derecha
+    table(data, position: :right, width: 200, column_widths: [100, 100]) do
+      cells.borders = []
+      cells.padding = [2, 5, 2, 5]
+      column(0).font_style = :bold
+      column(0).align = :right
+      column(1).align = :right
       
-      data = [
-        ['Subtotal:', "¢#{number_with_delimiter(@factura.subtotal, delimiter: ',')}"],
-        [impuesto_text, "¢#{number_with_delimiter(@factura.impuesto, delimiter: ',')}"],
-        ['TOTAL:', "¢#{number_with_delimiter(@factura.total, delimiter: ',')}"]
-      ]
-      
-      table(data, width: 200, column_widths: [100, 100]) do
-        cells.borders = []
-        cells.padding = [2, 5, 2, 5]
-        column(0).font_style = :bold
-        column(0).align = :right
-        column(1).align = :right
-        
-        # Hacer la última fila (total) más destacada
-        row(-1).font_style = :bold
-        row(-1).size = 12
-        row(-1).borders = [:top]
-        row(-1).border_width = 1
-      end
+      # Hacer la última fila (total) más destacada
+      row(-1).font_style = :bold
+      row(-1).size = 12
+      row(-1).borders = [:top]
+      row(-1).border_width = 1
     end
   end
 

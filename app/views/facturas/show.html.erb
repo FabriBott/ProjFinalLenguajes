@@ -70,10 +70,18 @@
                 <span>Subtotal:</span>
                 <span>₡<%= number_with_delimiter(@factura.subtotal, delimiter: ',') %></span>
               </div>
-              <div class="d-flex justify-content-between">
-                <span>Impuesto (13%):</span>
-                <span>₡<%= number_with_delimiter(@factura.impuesto, delimiter: ',') %></span>
-              </div>
+              <% @factura.detalle_impuestos.each do |impuesto_detalle| %>
+                <div class="d-flex justify-content-between">
+                  <span><%= impuesto_detalle[:nombre] %> (<%= impuesto_detalle[:porcentaje] %>%):</span>
+                  <span>₡<%= number_with_delimiter(impuesto_detalle[:monto], delimiter: ',') %></span>
+                </div>
+              <% end %>
+              <% if @factura.detalle_impuestos.size > 1 %>
+                <div class="d-flex justify-content-between">
+                  <span>Total Impuestos:</span>
+                  <span>₡<%= number_with_delimiter(@factura.impuesto, delimiter: ',') %></span>
+                </div>
+              <% end %>
               <hr>
               <div class="d-flex justify-content-between">
                 <strong>Total:</strong>

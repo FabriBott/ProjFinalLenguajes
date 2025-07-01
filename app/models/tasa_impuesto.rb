@@ -1,4 +1,8 @@
 class TasaImpuesto < ApplicationRecord
+  has_many :facturas, dependent: :nullify # Relación original para compatibilidad
+  has_many :factura_tasa_impuestos, dependent: :destroy
+  has_many :facturas_multiples, through: :factura_tasa_impuestos, source: :factura
+  
   validates :nombre, presence: true, uniqueness: { case_sensitive: false }
   validates :porcentaje, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
   
@@ -20,7 +24,8 @@ class TasaImpuesto < ApplicationRecord
   end
   
   def puede_ser_eliminado?
-    !Factura.exists?(tasa_impuesto_id: id)
+    # Verificar tanto en la relación original como en la nueva tabla intermedia
+    !facturas.exists? && !factura_tasa_impuestos.exists?
   end
   
   private

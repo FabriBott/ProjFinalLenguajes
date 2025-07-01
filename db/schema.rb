@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_01_021354) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_01_050544) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -35,6 +35,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_01_021354) do
     t.datetime "updated_at", null: false
     t.index ["factura_id"], name: "index_detalle_facturas_on_factura_id"
     t.index ["producto_id"], name: "index_detalle_facturas_on_producto_id"
+  end
+
+  create_table "factura_tasa_impuestos", force: :cascade do |t|
+    t.bigint "factura_id", null: false
+    t.bigint "tasa_impuesto_id", null: false
+    t.decimal "monto_impuesto", precision: 10, scale: 2, default: "0.0"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["factura_id", "tasa_impuesto_id"], name: "index_factura_tasa_impuestos_unique", unique: true
+    t.index ["factura_id"], name: "index_factura_tasa_impuestos_on_factura_id"
+    t.index ["tasa_impuesto_id"], name: "index_factura_tasa_impuestos_on_tasa_impuesto_id"
   end
 
   create_table "facturas", force: :cascade do |t|
@@ -75,6 +86,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_01_021354) do
 
   add_foreign_key "detalle_facturas", "facturas"
   add_foreign_key "detalle_facturas", "productos"
+  add_foreign_key "factura_tasa_impuestos", "facturas"
+  add_foreign_key "factura_tasa_impuestos", "tasa_impuestos"
   add_foreign_key "facturas", "clientes"
   add_foreign_key "facturas", "tasa_impuestos"
 end
