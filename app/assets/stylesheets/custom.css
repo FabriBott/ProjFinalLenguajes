@@ -1,0 +1,116 @@
+/* Estilos personalizados para mejorar la interfaz */
+
+/* Botones mejorados */
+.btn-group .btn {
+  border-radius: 0;
+}
+
+.btn-group .btn:first-child {
+  border-top-left-radius: 0.375rem;
+  border-bottom-left-radius: 0.375rem;
+}
+
+.btn-group .btn:last-child {
+  border-top-right-radius: 0.375rem;
+  border-bottom-right-radius: 0.375rem;
+}
+
+/* Mejora para botones de acción en tablas */
+.btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  min-width: 35px;
+  text-align: center;
+}
+
+/* Hover effects para botones */
+.btn-outline-info:hover {
+  background-color: #0dcaf0;
+  border-color: #0dcaf0;
+  color: #000;
+}
+
+.btn-outline-warning:hover {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #000;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: #fff;
+}
+
+/* Espaciado uniforme para formularios */
+.form-control:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Mejorar tarjetas */
+.card {
+  border: none;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+/* Mejorar tablas */
+.table-striped > tbody > tr:nth-of-type(odd) > td {
+  background-color: rgba(0, 0, 0, 0.025);
+}
+
+.table th {
+  border-top: none;
+  font-weight: 600;
+  padding: 1rem 0.75rem;
+}
+
+.table td {
+  padding: 1rem 0.75rem;
+  vertical-align: middle;
+}
+
+/* Responsivo para botones en móvil */
+@media (max-width: 768px) {
+  .btn-group {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .btn-group .btn {
+    border-radius: 0.375rem !important;
+    margin-bottom: 0.25rem;
+  }
+  
+  .btn-group .btn:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* Mejorar alertas */
+.alert {
+  border: none;
+  border-radius: 0.5rem;
+}
+
+/* Animaciones suaves */
+.btn, .card, .form-control {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Vista previa del producto */
+#product-preview {
+  border-left: 4px solid #198754;
+  background-color: #f8f9fa;
+}
+
+/* Iconos con mejor espaciado */
+.fas {
+  width: 1em;
+  text-align: center;
+}
+

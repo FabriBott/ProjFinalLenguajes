@@ -1,4 +1,17 @@
-<h1><%= action_name == "new" ? "Nuevo producto" : "Editar producto" %></h1>
-
-<%= render 'form', producto: @producto %>
-<%= link_to 'Volver', productos_path %>
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-plus-circle me-2"></i>
+            Nuevo Producto
+          </h3>
+        </div>
+        <div class="card-body">
+          <%= render 'form', producto: @producto %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

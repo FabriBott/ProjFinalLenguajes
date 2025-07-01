@@ -20,9 +20,7 @@ class TasaImpuesto < ApplicationRecord
   end
   
   def puede_ser_eliminado?
-    # Verificar si hay facturas que usen esta tasa
-    # Por ahora retornamos true, luego lo modificaremos cuando agreguemos la relación
-    true
+    !Factura.exists?(tasa_impuesto_id: id)
   end
   
   private

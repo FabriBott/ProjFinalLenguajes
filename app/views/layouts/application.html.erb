@@ -12,6 +12,12 @@
 
     <%# Custom Bootstrap Theme - Local file %>
     <%= stylesheet_link_tag 'bootstrap.min', "data-turbo-track": "reload" %>
+    
+    <%# Font Awesome for icons %>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <%# Custom styles %>
+    <%= stylesheet_link_tag 'custom', "data-turbo-track": "reload" %>
 
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>

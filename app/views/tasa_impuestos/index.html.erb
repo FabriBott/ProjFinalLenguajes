@@ -44,9 +44,17 @@
                           <%= link_to 'Ver', tasa, class: 'btn btn-sm btn-outline-info' %>
                           <%= link_to 'Editar', edit_tasa_impuesto_path(tasa), class: 'btn btn-sm btn-outline-warning' %>
                           <% if tasa.puede_ser_eliminado? %>
-                            <%= link_to 'Eliminar', tasa, method: :delete, 
-                                        confirm: '¿Está seguro de eliminar esta tasa de impuesto?', 
-                                        class: 'btn btn-sm btn-outline-danger' %>
+                            <button type="button" class="btn btn-sm btn-outline-danger" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#deleteModal<%= tasa.id %>">
+                              Eliminar
+                            </button>
+                          <% else %>
+                            <button type="button" class="btn btn-sm btn-secondary" 
+                                    title="No se puede eliminar: está siendo utilizada por facturas"
+                                    disabled>
+                              En uso
+                            </button>
                           <% end %>
                         </div>
                       </td>
@@ -67,3 +75,47 @@
     </div>
   </div>
 </div>
+
+<!-- Modales de confirmación para eliminación -->
+<% @tasa_impuestos.each do |tasa| %>
+  <% if tasa.puede_ser_eliminado? %>
+    <div class="modal fade" id="deleteModal<%= tasa.id %>" tabindex="-1" aria-labelledby="deleteModalLabel<%= tasa.id %>" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="deleteModalLabel<%= tasa.id %>">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              Confirmar Eliminación
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-warning">
+              <h6 class="alert-heading">¿Está seguro de eliminar esta tasa de impuesto?</h6>
+              <hr>
+              <p class="mb-1"><strong>Nombre:</strong> <%= tasa.nombre %></p>
+              <p class="mb-1"><strong>Porcentaje:</strong> <%= tasa.porcentaje %>%</p>
+              <p class="mb-0"><strong>Descripción:</strong> <%= tasa.descripcion %></p>
+            </div>
+            <p class="text-danger mb-0">
+              <i class="fas fa-exclamation-circle me-1"></i>
+              <strong>Esta acción no se puede deshacer.</strong>
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times me-1"></i>
+              Cancelar
+            </button>
+            <%= button_to tasa_impuesto_path(tasa), method: :delete, 
+                         class: 'btn btn-danger', 
+                         form: { style: 'display: inline;' } do %>
+              <i class="fas fa-trash me-1"></i>
+              Eliminar Definitivamente
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>

@@ -1,2 +1,96 @@
-ch1>Crear Nueva Tasa de Impuestoc/h1>
-c%= render 'form', tasa_impuesto: @tasa_impuesto %e
+<div class="container-fluid mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-plus-circle me-2"></i>
+            Crear Nueva Tasa de Impuesto
+          </h3>
+        </div>
+        <div class="card-body">
+          <!-- Tasas predefinidas -->
+          <div class="mb-4">
+            <h6 class="text-muted mb-3">Tasas Comunes:</h6>
+            <div class="d-flex flex-wrap gap-2">
+              <button type="button" class="btn btn-outline-secondary btn-sm preset-btn" 
+                      data-nombre="IVA General" data-porcentaje="13" data-descripcion="Impuesto al Valor Agregado general de Costa Rica">
+                IVA 13%
+              </button>
+              <button type="button" class="btn btn-outline-secondary btn-sm preset-btn" 
+                      data-nombre="IVA Reducido" data-porcentaje="4" data-descripcion="Impuesto al Valor Agregado reducido">
+                IVA 4%
+              </button>
+              <button type="button" class="btn btn-outline-secondary btn-sm preset-btn" 
+                      data-nombre="Exento" data-porcentaje="0" data-descripcion="Productos exentos de impuestos">
+                Exento 0%
+              </button>
+              <button type="button" class="btn btn-outline-secondary btn-sm preset-btn" 
+                      data-nombre="IVA Internacional" data-porcentaje="21" data-descripcion="IVA estándar internacional">
+                IVA 21%
+              </button>
+            </div>
+          </div>
+          
+          <hr class="my-4">
+          
+          <%= render 'form', tasa_impuesto: @tasa_impuesto %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Manejar botones de tasas predefinidas
+    document.querySelectorAll('.preset-btn').forEach(button => {
+      button.addEventListener('click', function() {
+        const nombre = this.dataset.nombre;
+        const porcentaje = this.dataset.porcentaje;
+        const descripcion = this.dataset.descripcion;
+        
+        document.getElementById('tasa_impuesto_nombre').value = nombre;
+        document.getElementById('tasa_impuesto_porcentaje').value = porcentaje;
+        document.getElementById('tasa_impuesto_descripcion').value = descripcion;
+        
+        // Marcar como activo por defecto
+        document.getElementById('tasa_impuesto_activo').checked = true;
+        
+        // Actualizar preview
+        updatePreview();
+        
+        // Resaltar el botón seleccionado
+        document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('btn-primary'));
+        document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.add('btn-outline-secondary'));
+        this.classList.remove('btn-outline-secondary');
+        this.classList.add('btn-primary');
+      });
+    });
+    
+    // Actualizar preview cuando cambien los valores
+    ['tasa_impuesto_nombre', 'tasa_impuesto_porcentaje', 'tasa_impuesto_descripcion'].forEach(id => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.addEventListener('input', updatePreview);
+      }
+    });
+    
+    function updatePreview() {
+      const nombre = document.getElementById('tasa_impuesto_nombre').value || 'Nueva Tasa';
+      const porcentaje = document.getElementById('tasa_impuesto_porcentaje').value || '0';
+      const descripcion = document.getElementById('tasa_impuesto_descripcion').value || 'Sin descripción';
+      
+      const previewElement = document.getElementById('tax-preview');
+      if (previewElement) {
+        previewElement.innerHTML = `
+          <strong>${nombre} (${porcentaje}%)</strong><br>
+          <small class="text-muted">${descripcion}</small>
+        `;
+      }
+    }
+    
+    // Inicializar preview
+    updatePreview();
+  });
+</script>

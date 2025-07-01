@@ -15,7 +15,7 @@ class ProductosController < ApplicationController
   def create
     @producto = Producto.new(producto_params)
     if @producto.save
-      redirect_to @producto, notice: "Producto creado exitosamente."
+      redirect_to productos_path, notice: "El producto '#{@producto.nombre}' fue creado exitosamente."
     else
       render :new, status: :unprocessable_entity
     end
@@ -26,15 +26,16 @@ class ProductosController < ApplicationController
 
   def update
     if @producto.update(producto_params)
-      redirect_to @producto, notice: "Producto actualizado correctamente."
+      redirect_to productos_path, notice: "El producto '#{@producto.nombre}' fue actualizado exitosamente."
     else
       render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
+    nombre_producto = @producto.nombre
     @producto.destroy
-    redirect_to productos_path, notice: "Producto eliminado."
+    redirect_to productos_path, notice: "El producto '#{nombre_producto}' fue eliminado exitosamente."
   end
 
   private

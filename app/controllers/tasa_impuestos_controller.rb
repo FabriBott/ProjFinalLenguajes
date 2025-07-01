@@ -16,9 +16,9 @@ class TasaImpuestosController < ApplicationController
     @tasa_impuesto = TasaImpuesto.new(tasa_impuesto_params)
 
     if @tasa_impuesto.save
-      redirect_to @tasa_impuesto, notice: 'Tasa de impuesto creada exitosamente.'
+      redirect_to tasa_impuestos_path, notice: "La tasa de impuesto '#{@tasa_impuesto.nombre}' fue creada exitosamente."
     else
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -27,17 +27,21 @@ class TasaImpuestosController < ApplicationController
 
   def update
     if @tasa_impuesto.update(tasa_impuesto_params)
-      redirect_to @tasa_impuesto, notice: 'Tasa de impuesto actualizada exitosamente.'
+      redirect_to tasa_impuestos_path, notice: "La tasa de impuesto '#{@tasa_impuesto.nombre}' fue actualizada exitosamente."
     else
-      render :edit
+      render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
-    if @tasa_impuesto.puede_ser_eliminado? && @tasa_impuesto.destroy
-      redirect_to tasa_impuestos_url, notice: 'Tasa de impuesto eliminada exitosamente.'
+    nombre_tasa = @tasa_impuesto.nombre
+    
+    if !@tasa_impuesto.puede_ser_eliminado?
+      redirect_to tasa_impuestos_url, alert: "No se puede eliminar la tasa '#{nombre_tasa}' porque está siendo utilizada por facturas existentes."
+    elsif @tasa_impuesto.destroy
+      redirect_to tasa_impuestos_url, notice: "La tasa de impuesto '#{nombre_tasa}' fue eliminada exitosamente."
     else
-      redirect_to tasa_impuestos_url, alert: 'No se puede eliminar la tasa de impuesto.'
+      redirect_to tasa_impuestos_url, alert: "Ocurrió un error al eliminar la tasa de impuesto '#{nombre_tasa}'."
     end
   end
 

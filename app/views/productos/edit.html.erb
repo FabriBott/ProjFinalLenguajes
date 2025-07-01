@@ -1,4 +1,25 @@
-<h1><%= action_name == "new" ? "Nuevo producto" : "Editar producto" %></h1>
-
-<%= render 'form', producto: @producto %>
-<%= link_to 'Volver', productos_path %>
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow">
+        <div class="card-header bg-warning text-dark">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-edit me-2"></i>
+            Editar Producto
+          </h3>
+        </div>
+        <div class="card-body">
+          <!-- Información actual -->
+          <div class="alert alert-info mb-4">
+            <h6 class="alert-heading">Información Actual:</h6>
+            <p class="mb-1"><strong>Nombre:</strong> <%= @producto.nombre %></p>
+            <p class="mb-1"><strong>Precio:</strong> ₡<%= number_with_delimiter(@producto.precio, delimiter: ',') %></p>
+            <p class="mb-0"><strong>Stock:</strong> <%= @producto.stock %> unidades</p>
+          </div>
+          
+          <%= render 'form', producto: @producto %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

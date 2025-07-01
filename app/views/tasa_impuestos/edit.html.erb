@@ -1,2 +1,34 @@
-ch1>Editar Tasa de Impuestoc/h1>
-c%= render 'form', tasa_impuesto: @tasa_impuesto %e
+<div class="container-fluid mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow">
+        <div class="card-header bg-warning text-dark">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-edit me-2"></i>
+            Editar Tasa de Impuesto
+          </h3>
+        </div>
+        <div class="card-body">
+          <!-- Información actual -->
+          <div class="alert alert-info mb-4">
+            <h6 class="alert-heading">Información Actual:</h6>
+            <p class="mb-1"><strong>Nombre:</strong> <%= @tasa_impuesto.nombre %></p>
+            <p class="mb-1"><strong>Porcentaje:</strong> <%= @tasa_impuesto.porcentaje %>%</p>
+            <p class="mb-1"><strong>Estado:</strong> 
+              <% if @tasa_impuesto.activo? %>
+                <span class="badge bg-success">Activo</span>
+              <% else %>
+                <span class="badge bg-secondary">Inactivo</span>
+              <% end %>
+              <% if @tasa_impuesto.predeterminado? %>
+                <span class="badge bg-primary ms-1">Predeterminado</span>
+              <% end %>
+            </p>
+          </div>
+          
+          <%= render 'form', tasa_impuesto: @tasa_impuesto %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
