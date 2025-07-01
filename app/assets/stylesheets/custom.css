@@ -114,3 +114,75 @@
   text-align: center;
 }
 
+/* Estilos para alertas de stock */
+.badge {
+  font-size: 0.75em;
+  padding: 0.35em 0.65em;
+}
+
+/* Animación para badges de alerta */
+.badge.bg-danger, .badge.bg-warning {
+  animation: pulse-alert 2s infinite;
+}
+
+@keyframes pulse-alert {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Mejorar alertas del dashboard */
+.alert {
+  border-left: 4px solid;
+}
+
+.alert-warning {
+  border-left-color: #ffc107;
+}
+
+.alert-danger {
+  border-left-color: #dc3545;
+}
+
+.alert-info {
+  border-left-color: #0dcaf0;
+}
+
+/* Iconos circulares */
+.rounded-circle {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover effect para filas de tabla con alertas */
+tr:has(.badge.bg-danger) {
+  background-color: rgba(220, 53, 69, 0.05) !important;
+}
+
+tr:has(.badge.bg-warning) {
+  background-color: rgba(255, 193, 7, 0.05) !important;
+}
+
+/* Notificación en navbar */
+.navbar .badge {
+  font-size: 0.7em;
+  animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 60%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-3px);
+  }
+  80% {
+    transform: translateY(-1px);
+  }
+}
+

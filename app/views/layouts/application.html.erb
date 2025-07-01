@@ -49,7 +49,15 @@
               <%= link_to "Clientes", clientes_path, class: "nav-link #{'active' if controller_name == 'clientes'}" %>
             </li>
             <li class="nav-item">
-              <%= link_to "Productos", productos_path, class: "nav-link #{'active' if controller_name == 'productos'}" %>
+              <% 
+                productos_alertas = Producto.sin_stock.count + Producto.con_stock_critico.count
+              %>
+              <%= link_to productos_path, class: "nav-link #{'active' if controller_name == 'productos'}" do %>
+                Productos
+                <% if productos_alertas > 0 %>
+                  <span class="badge bg-danger ms-1"><%= productos_alertas %></span>
+                <% end %>
+              <% end %>
             </li>
             <li class="nav-item">
               <%= link_to "Impuestos", tasa_impuestos_path, class: "nav-link #{'active' if controller_name == 'tasa_impuestos'}" %>
